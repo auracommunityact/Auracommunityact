@@ -33,7 +33,7 @@ export const siteConfig = {
   ],
 
   projects: [
-    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active", link: "https://aura.auralearning.workers.dev" }
+    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active", link: "https://aura.auralearning.workers.dev", logo: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/opened_book_logo_1782632258077.jpg" }
   ],
 
   services: [

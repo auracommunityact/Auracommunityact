@@ -224,8 +224,8 @@ export function ProjectsSection() {
             className="flex flex-col h-full p-8 rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/10 hover:border-amber-500/30 transition-all cursor-pointer group"
           >
             <div className="flex justify-between items-start mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-2 shadow-lg">
-                <img src={siteConfig.logo} alt="Logo" className="w-full h-full object-contain" />
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg overflow-hidden ${(project as any).logo ? 'bg-black border border-white/10' : 'bg-gradient-to-br from-purple-600 to-blue-600 p-2'}`}>
+                <img src={(project as any).logo || siteConfig.logo} alt={`${project.name} Logo`} className={`w-full h-full ${(project as any).logo ? 'object-cover' : 'object-contain'}`} />
               </div>
               <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${
                 project.status === 'Active' ? 'bg-green-500/20 text-green-400' :
