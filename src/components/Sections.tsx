@@ -130,10 +130,10 @@ export function AboutSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.7 }}
-          className="relative rounded-3xl overflow-hidden aspect-square lg:aspect-[4/3] bg-white/[0.03] backdrop-blur-xl border border-white/10 flex items-center justify-center p-12"
+          className="relative rounded-3xl overflow-hidden aspect-square lg:aspect-[4/3] bg-white/[0.03] backdrop-blur-xl border border-white/10 flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-amber-500/20 mix-blend-overlay"></div>
-          <img src={siteConfig.logo} alt="Aura Logo" className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-amber-500/20 mix-blend-overlay z-20 pointer-events-none"></div>
+          <img src="https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/IMG_20260827_111033.jpg" alt="Aura Community ACT" className="w-full h-full object-cover relative z-10" />
         </motion.div>
       </div>
     </section>

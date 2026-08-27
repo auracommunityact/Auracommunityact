@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Aura Community ACT",
   description: "Aura Community ACT is a technology and community initiative focused on digital projects, innovation, education, creativity and building meaningful digital experiences.",
   logo: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/20260716_092212.png",
-  founderPhoto: "https://reference-url-citation.invalid/3",
+  founderPhoto: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/IMG_20260827_111033.jpg",
   address: "7gf.road 02, Hn.1, madarse wali gali, Alvi Nagar, Loni, Ghaziabad, Uttar Pradesh 201102, India",
   googleMapsQuery: "7gf.road 02, Hn.1, madarse wali gali, Alvi Nagar, Loni, Ghaziabad, Uttar Pradesh 201102, India",
   year: 2026,
