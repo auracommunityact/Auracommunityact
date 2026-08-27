@@ -240,9 +240,15 @@ export function ProjectsSection() {
             <h3 className="text-xl font-bold text-white mb-2">{project.name}</h3>
             <p className="text-sm text-white/50 leading-relaxed flex-1 mb-6">{project.description}</p>
             
-            <button className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
-              Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-            </button>
+            {(project as any).link ? (
+              <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
+                Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              </a>
+            ) : (
+              <button className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
+                Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
           </motion.div>
         ))}
       </div>

@@ -33,13 +33,7 @@ export const siteConfig = {
   ],
 
   projects: [
-    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active" },
-    { name: "Aura Movie", description: "A digital media experience exploring cinematic narratives.", category: "Entertainment", status: "Coming Soon" },
-    { name: "Aura Search", description: "An innovative digital search and discovery tool.", category: "Technology", status: "In Development" },
-    { name: "Aura Store", description: "A digital storefront for Aura community products and services.", category: "E-commerce", status: "Coming Soon" },
-    { name: "Aura Gaming", description: "Creative digital gaming experiences and interactive media.", category: "Gaming", status: "In Development" },
-    { name: "Aura Studio", description: "Our creative hub for design, development, and digital art.", category: "Creative", status: "Active" },
-    { name: "Future Aura Projects", description: "Upcoming confidential initiatives pushing the boundaries of digital experiences.", category: "Innovation", status: "In Development" }
+    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active", link: "https://aura.auralearning.workers.dev" }
   ],
 
   services: [
