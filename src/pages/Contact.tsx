@@ -1,17 +1,32 @@
 import { useState } from "react";
 import { LocationSection } from "../components/Sections";
-import { Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2, Mail } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
 
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
-    // Simulate network request
-    setTimeout(() => {
+    
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const subject = formData.get("subject") as string;
+    const message = formData.get("message") as string;
+
+    try {
+      const { error } = await supabase.from("contact_messages").insert([{
+        name, email, subject, message
+      }]);
+      if (error) throw error;
       setStatus("success");
-    }, 1200);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send message");
+      setStatus("idle");
+    }
   };
 
   return (
@@ -19,9 +34,13 @@ export default function Contact() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
         <div className="text-center mb-16">
           <h1 className="text-3xl sm:text-5xl font-bold text-white mb-6">Let's Connect</h1>
-          <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto mb-8">
             Have an idea, question, collaboration opportunity or simply want to connect with Aura Community ACT? Get in touch with us.
           </p>
+          <a href="mailto:auracommunityact@gmail.com" className="inline-flex items-center gap-3 px-6 py-3 bg-white/[0.03] hover:bg-white/10 border border-white/10 rounded-full text-white transition-colors mx-auto">
+            <Mail className="w-5 h-5 text-amber-500" />
+            <span className="font-semibold">auracommunityact@gmail.com</span>
+          </a>
         </div>
 
         <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-12 shadow-xl">
@@ -49,6 +68,7 @@ export default function Contact() {
                   <input 
                     type="text" 
                     id="name" 
+                    name="name"
                     required 
                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
                     placeholder="Your name"
@@ -59,6 +79,7 @@ export default function Contact() {
                   <input 
                     type="email" 
                     id="email" 
+                    name="email"
                     required 
                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
                     placeholder="your@email.com"
@@ -70,6 +91,7 @@ export default function Contact() {
                 <input 
                   type="text" 
                   id="subject" 
+                  name="subject"
                   required 
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
                   placeholder="How can we help?"
@@ -79,6 +101,7 @@ export default function Contact() {
                 <label htmlFor="message" className="text-sm font-bold uppercase tracking-widest text-white/80 block">Message</label>
                 <textarea 
                   id="message" 
+                  name="message"
                   required 
                   rows={5}
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors resize-none"
