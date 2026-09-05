@@ -1,7 +1,8 @@
+import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { siteConfig } from "../config";
-import { ArrowRight, Code, Laptop, Lightbulb, Users, Send, MapPin, Rocket, Shield, Globe } from "lucide-react";
+import { ArrowRight, Code, Laptop, Lightbulb, Users, Send, MapPin, Rocket, Shield, Globe, Search } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -204,17 +205,48 @@ export function VisionSection() {
 }
 
 export function ProjectsSection() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) return siteConfig.projects;
+    const lowerQuery = searchQuery.toLowerCase();
+    return siteConfig.projects.filter(
+      (project) =>
+        project.name.toLowerCase().includes(lowerQuery) ||
+        project.description.toLowerCase().includes(lowerQuery) ||
+        project.category.toLowerCase().includes(lowerQuery)
+    );
+  }, [searchQuery]);
+
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-      <div className="flex justify-between items-end mb-16">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
         <div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Our Projects</h2>
           <p className="text-white/60">Discover what we are building at Aura Community ACT.</p>
         </div>
+        
+        <div className="relative max-w-sm w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-white/40" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-white/[0.03] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors sm:text-sm backdrop-blur-xl"
+            placeholder="Search projects by name or category..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {siteConfig.projects.map((project, idx) => (
+      {filteredProjects.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-white/50 text-lg">No projects found matching your search.</p>
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProjects.map((project, idx) => (
           <motion.div
             key={project.name}
             initial={{ opacity: 0, y: 20 }}
@@ -237,10 +269,23 @@ export function ProjectsSection() {
             </div>
             
             <span className="text-xs font-bold text-white/40 uppercase tracking-widest mb-2">{project.category}</span>
-            <h3 className="text-xl font-bold text-white mb-2">{project.name}</h3>
+            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-1.5">
+              {project.name}
+              {(project as any).verified && (
+                <img 
+                  src="https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/1000205715-Photoroom.png" 
+                  alt="Verified" 
+                  className="w-5 h-5 object-contain"
+                />
+              )}
+            </h3>
             <p className="text-sm text-white/50 leading-relaxed flex-1 mb-6">{project.description}</p>
             
-            {(project as any).link ? (
+            {project.status === 'Coming Soon' ? (
+              <span className="flex items-center gap-2 text-xs font-semibold text-white/40 mt-auto w-fit">
+                Coming Soon
+              </span>
+            ) : (project as any).link && (project as any).link !== '#' ? (
               <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
                 Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
               </a>
@@ -252,6 +297,7 @@ export function ProjectsSection() {
           </motion.div>
         ))}
       </div>
+      )}
     </section>
   );
 }

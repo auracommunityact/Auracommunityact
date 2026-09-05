@@ -33,7 +33,8 @@ export const siteConfig = {
   ],
 
   projects: [
-    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active", link: "https://aura.auralearning.workers.dev", logo: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/opened_book_logo_1782632258077.jpg" }
+    { name: "Aura Learning", description: "A technology-supported educational platform for continuous learning.", category: "Education", status: "Active", link: "https://aura.auralearning.workers.dev", logo: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/opened_book_logo_1782632258077.jpg", verified: true },
+    { name: "Aura Play", description: "Aura Play is a gaming-focused platform under Aura Community Act, designed to bring gaming content, experiences, and community features together in one place.", category: "Gaming / Gaming Platform", status: "Coming Soon", link: "#", logo: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/file_000000003378820ea02df9bf500b37bd.png" }
   ],
 
   services: [

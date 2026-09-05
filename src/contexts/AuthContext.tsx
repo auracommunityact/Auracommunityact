@@ -30,11 +30,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+      
+      // Fallback for manually created Uppercase table
+      if (error && error.code === 'PGRST205') {
+        const fallback = await supabase
+          .from('Profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        data = fallback.data;
+        error = fallback.error;
+      }
       
       if (error && error.code !== 'PGRST116') throw error;
       
