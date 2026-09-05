@@ -51,6 +51,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data) {
         setProfile(data);
+      } else if (error && error.code === 'PGRST116') {
+        // If profile row doesn't exist but user is authenticated, 
+        // create a minimal fallback profile state to prevent locking the user out.
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        setProfile({
+          id: userId,
+          full_name: freshUser?.user_metadata?.full_name || 'User',
+          username: freshUser?.user_metadata?.username || 'user',
+          email: freshUser?.email || '',
+          country: '',
+          age_group: '',
+          role: '',
+          skills_interests: '',
+          about: '',
+          status: 'not_applied',
+          created_at: new Date().toISOString()
+        } as Profile);
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
@@ -64,25 +81,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id);
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    let mounted = true;
 
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    // Use a single initialization source of truth to avoid race conditions
+    // onAuthStateChange fires an INITIAL_SESSION event automatically on mount in newer Supabase versions
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (!mounted) return;
+      
       setSession(newSession);
       setUser(newSession?.user ?? null);
       
@@ -91,10 +96,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setProfile(null);
       }
-      setLoading(false);
+      
+      if (mounted) {
+        setLoading(false);
+      }
     });
 
+    // Fallback: manually fetch session just in case INITIAL_SESSION doesn't fire immediately
+    const checkSession = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (mounted && loading) {
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          if (currentSession?.user) {
+            await fetchProfile(currentSession.user.id);
+          }
+          if (mounted) setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error fetching session manually", err);
+        if (mounted) setLoading(false);
+      }
+    };
+    
+    checkSession();
+
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
