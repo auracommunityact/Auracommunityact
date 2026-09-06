@@ -43,17 +43,23 @@ export default function AdminDashboard() {
 
   const handleUpdateAppStatus = async (appId: string, userId: string, status: string, reason?: string) => {
     try {
+      const { data, error } = await supabase.rpc('admin_update_application_status', {
+        app_id: appId,
+        new_status: status,
+        rej_reason: reason || null
+      });
+
+      if (error) throw error;
+      
       const updates: any = { status, reviewed_at: new Date().toISOString(), reviewed_by: user?.id };
       if (reason !== undefined) updates.rejection_reason = reason;
 
-      const { error } = await supabase.from('community_applications').update(updates).eq('id', appId);
-      if (error) throw error;
-      
-      // Sync profile status
-      await supabase.from('profiles').update({ status }).eq('id', userId);
+      // Sync local state immediately for instant UI feedback without reload
+      setData(prev => prev.map(app => 
+        app.id === appId ? { ...app, ...updates } : app
+      ));
       
       toast.success(`Application marked as ${status}`);
-      fetchData('applications');
     } catch (err: any) {
       toast.error(err.message || 'Error updating status');
     }
@@ -75,20 +81,37 @@ export default function AdminDashboard() {
         const app = data.find(d => d.id === appId);
         if (!app) return;
         
+        const { error } = await supabase.rpc('admin_update_application_status', {
+          app_id: appId,
+          new_status: status,
+          rej_reason: reason || null
+        });
+
+        if (error) throw error;
+        
         const appUpdates: any = { status, reviewed_at: new Date().toISOString(), reviewed_by: user?.id };
         if (reason !== undefined) appUpdates.rejection_reason = reason;
-
-        await supabase.from('community_applications').update(appUpdates).eq('id', appId);
-        await supabase.from('profiles').update({ status }).eq('id', app.user_id);
+        
+        return { id: appId, ...appUpdates };
       });
 
-      await Promise.all(updates);
+      const results = await Promise.all(updates);
+      
+      // Sync local state immediately
+      setData(prev => {
+        const newArray = [...prev];
+        for (const res of results) {
+           const idx = newArray.findIndex(a => a.id === res?.id);
+           if (idx > -1) newArray[idx] = { ...newArray[idx], ...res };
+        }
+        return newArray;
+      });
       
       toast.success(`Successfully updated ${selectedApps.size} applications`);
       setSelectedApps(new Set());
-      fetchData('applications');
     } catch (err: any) {
       toast.error(err.message || 'Error performing bulk update');
+    } finally {
       setLoadingData(false);
     }
   };

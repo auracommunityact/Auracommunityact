@@ -30,8 +30,14 @@ export default function Navbar() {
       const loggedInLinks = [
         { title: "Home", href: "/" },
         { title: "Community", href: "/community" },
-        { title: "My Application", href: "/my-application" },
       ];
+      
+      if (profile?.status === 'approved') {
+        loggedInLinks.push({ title: "Members Area", href: "/members" });
+      } else {
+        loggedInLinks.push({ title: "My Application", href: "/my-application" });
+      }
+
       if (isAdmin) {
         loggedInLinks.push({ title: "Admin Panel", href: "/admin" });
       }

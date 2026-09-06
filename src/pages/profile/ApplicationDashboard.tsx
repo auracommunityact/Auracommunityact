@@ -47,9 +47,18 @@ export default function ApplicationDashboard() {
     }
   };
 
+  const getStatusHeading = (status: string) => {
+    switch(status) {
+      case 'approved': return '🎉 Application Approved';
+      case 'rejected': return 'Application Rejected';
+      case 'under_review': return 'Under Review';
+      default: return status.replace('_', ' ');
+    }
+  };
+
   const getStatusMessage = (status: string) => {
     switch(status) {
-      case 'approved': return 'Your application has been approved. Welcome to Aura Community Act!';
+      case 'approved': return 'Congratulations! Your application has been approved. You are now an Aura Community ACT Member.';
       case 'rejected': return 'Your application was not approved at this time.';
       case 'under_review': return 'An administrator is currently reviewing your application.';
       default: return 'An administrator is currently reviewing your application.';
@@ -62,7 +71,7 @@ export default function ApplicationDashboard() {
       
       <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8">
         <div className={`p-6 rounded-2xl border mb-8 flex flex-col items-center text-center ${getStatusColor(application.status)}`}>
-          <h2 className="text-2xl font-bold uppercase mb-2">{application.status.replace('_', ' ')}</h2>
+          <h2 className="text-2xl font-bold uppercase mb-2">{getStatusHeading(application.status)}</h2>
           <p className="opacity-90">{getStatusMessage(application.status)}</p>
           {application.status === 'rejected' && application.rejection_reason && (
             <div className="mt-4 p-4 bg-black/40 rounded-xl text-left w-full">

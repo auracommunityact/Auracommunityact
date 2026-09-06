@@ -20,6 +20,7 @@ import Settings from "./pages/profile/Settings";
 import ApplicationDashboard from "./pages/profile/ApplicationDashboard";
 import JoinCommunity from "./pages/JoinCommunity";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import MembersDashboard from "./pages/members/MembersDashboard";
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="my-application" element={<ApplicationDashboard />} />
             <Route path="join-community" element={<JoinCommunity />} />
             <Route path="admin/*" element={<AdminDashboard />} />
+            <Route path="members" element={<MembersDashboard />} />
           </Route>
         </Routes>
       </Router>
