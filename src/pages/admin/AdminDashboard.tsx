@@ -4,6 +4,7 @@ import { supabase, CommunityApplication } from '../../lib/supabase';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Download, X } from 'lucide-react';
+import AdminEvents from './AdminEvents';
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading } = useAuth();
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
       </div>
       
       <div className="flex gap-4 mb-8 border-b border-white/10 pb-4 overflow-x-auto">
-        {['applications', 'users', 'messages'].map(tab => (
+        {['applications', 'users', 'messages', 'events'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -187,10 +188,13 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 overflow-x-auto">
-        {loadingData ? (
-          <div className="py-8 text-center text-white/50">Loading data...</div>
-        ) : (
+      {activeTab === 'events' ? (
+        <AdminEvents />
+      ) : (
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 overflow-x-auto">
+          {loadingData ? (
+            <div className="py-8 text-center text-white/50">Loading data...</div>
+          ) : (
           <table className="w-full text-left text-sm text-white/80">
             <thead>
               <tr className="border-b border-white/10 text-white font-semibold">
@@ -273,8 +277,9 @@ export default function AdminDashboard() {
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {viewingApp && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">

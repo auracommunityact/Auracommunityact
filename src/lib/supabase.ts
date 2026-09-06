@@ -28,6 +28,18 @@ export type Profile = {
   is_admin?: boolean;
 };
 
+export type Event = {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  category: string;
+  description: string;
+  image: string | null;
+  created_at: string;
+};
+
 export type CommunityApplication = {
   id: string;
   user_id: string;
