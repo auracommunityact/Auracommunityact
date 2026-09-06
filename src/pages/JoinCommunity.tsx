@@ -77,12 +77,12 @@ export default function JoinCommunity() {
         instagram: formData.instagram,
         github: formData.github,
         website: formData.website,
-        status: 'pending'
+        status: 'under_review'
       }]);
 
       if (error) throw error;
 
-      await supabase.from('profiles').update({ status: 'pending' }).eq('id', user.id);
+      await supabase.from('profiles').update({ status: 'under_review' }).eq('id', user.id);
       
       toast.success("Application Submitted Successfully");
       await refreshProfile();

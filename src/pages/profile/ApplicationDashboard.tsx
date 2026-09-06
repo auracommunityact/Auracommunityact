@@ -33,7 +33,7 @@ export default function ApplicationDashboard() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <h2 className="text-2xl font-bold text-white mb-2">No Application Found</h2>
-        <p className="text-white/70">You haven't submitted a community application yet.</p>
+        <p className="text-white/70">Submit your community joining application to get started.</p>
       </div>
     );
   }
@@ -49,10 +49,10 @@ export default function ApplicationDashboard() {
 
   const getStatusMessage = (status: string) => {
     switch(status) {
-      case 'approved': return 'Congratulations! You are now an Aura Community ACT member.';
-      case 'rejected': return 'Your application was not approved.';
+      case 'approved': return 'Your application has been approved. Welcome to Aura Community Act!';
+      case 'rejected': return 'Your application was not approved at this time.';
       case 'under_review': return 'An administrator is currently reviewing your application.';
-      default: return 'Your application is currently being reviewed.';
+      default: return 'An administrator is currently reviewing your application.';
     }
   };
 
@@ -62,7 +62,7 @@ export default function ApplicationDashboard() {
       
       <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8">
         <div className={`p-6 rounded-2xl border mb-8 flex flex-col items-center text-center ${getStatusColor(application.status)}`}>
-          <h2 className="text-2xl font-bold capitalize mb-2">{application.status.replace('_', ' ')}</h2>
+          <h2 className="text-2xl font-bold uppercase mb-2">{application.status.replace('_', ' ')}</h2>
           <p className="opacity-90">{getStatusMessage(application.status)}</p>
           {application.status === 'rejected' && application.rejection_reason && (
             <div className="mt-4 p-4 bg-black/40 rounded-xl text-left w-full">
@@ -73,18 +73,59 @@ export default function ApplicationDashboard() {
         </div>
 
         <div className="space-y-4 text-white/70">
-          <div className="flex justify-between py-3 border-b border-white/10">
+          <h3 className="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">Application Details</h3>
+          
+          <div className="flex justify-between py-2 border-b border-white/10">
             <span className="font-medium text-white">Application ID</span>
             <span className="text-sm font-mono">{application.id.slice(0,8)}</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-white/10">
+          <div className="flex justify-between py-2 border-b border-white/10">
             <span className="font-medium text-white">Submitted Date</span>
             <span>{new Date(application.submitted_at).toLocaleDateString()}</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-white/10">
+          <div className="flex justify-between py-2 border-b border-white/10">
+            <span className="font-medium text-white">Full Name</span>
+            <span>{application.full_name}</span>
+          </div>
+          <div className="flex justify-between py-2 border-b border-white/10">
+            <span className="font-medium text-white">Username</span>
+            <span>@{application.username}</span>
+          </div>
+          <div className="flex justify-between py-2 border-b border-white/10">
+            <span className="font-medium text-white">Email</span>
+            <span>{application.email}</span>
+          </div>
+          <div className="flex justify-between py-2 border-b border-white/10">
             <span className="font-medium text-white">Role applied as</span>
             <span>{application.role}</span>
           </div>
+          
+          <div className="pt-4 space-y-4">
+            <div>
+              <span className="font-medium text-white block mb-1">Why I want to join:</span>
+              <p className="bg-black/30 p-4 rounded-xl">{application.reason_to_join}</p>
+            </div>
+            <div>
+              <span className="font-medium text-white block mb-1">My contribution:</span>
+              <p className="bg-black/30 p-4 rounded-xl">{application.contribution}</p>
+            </div>
+            <div>
+              <span className="font-medium text-white block mb-1">Skills & Interests:</span>
+              <p className="bg-black/30 p-4 rounded-xl">{application.skills_interests}</p>
+            </div>
+          </div>
+
+          {(application.github || application.website || application.youtube || application.discord) && (
+            <div className="pt-4">
+              <span className="font-medium text-white block mb-2">Links:</span>
+              <div className="flex flex-wrap gap-4">
+                {application.github && <a href={application.github} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline">GitHub</a>}
+                {application.website && <a href={application.website} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline">Website</a>}
+                {application.youtube && <a href={application.youtube} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline">YouTube</a>}
+                {application.discord && <span className="text-white/70">Discord: {application.discord}</span>}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

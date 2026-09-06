@@ -53,9 +53,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setProfile(data);
       } else if (error && error.code === 'PGRST116') {
         // If profile row doesn't exist but user is authenticated, 
-        // create a minimal fallback profile state to prevent locking the user out.
+        // create a minimal fallback profile state and save to database.
         const { data: { user: freshUser } } = await supabase.auth.getUser();
-        setProfile({
+        const newProfile = {
           id: userId,
           full_name: freshUser?.user_metadata?.full_name || 'User',
           username: freshUser?.user_metadata?.username || 'user',
@@ -65,9 +65,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           role: '',
           skills_interests: '',
           about: '',
-          status: 'not_applied',
+          status: 'not_applied' as const,
           created_at: new Date().toISOString()
-        } as Profile);
+        };
+        
+        // Insert it into the database
+        const { data: insertedProfile } = await supabase
+          .from('profiles')
+          .upsert(newProfile)
+          .select()
+          .single();
+          
+        setProfile((insertedProfile as Profile) || (newProfile as Profile));
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
@@ -128,7 +137,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const isAdmin = user?.email === 'auracommunityact@gmail.com' || profile?.is_admin === true;
+  const adminEmails = ['auracommunityact@gmail.com', 'shaan1002006@gmail.com'];
+  const isAdmin = adminEmails.includes(user?.email || '') || profile?.is_admin === true;
 
   return (
     <AuthContext.Provider value={{ session, user, profile, isAdmin, loading, refreshProfile }}>

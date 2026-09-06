@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CommunitySection } from "../components/Sections";
+import { EventCalendar } from "../components/EventCalendar";
 import { useAuth } from "../contexts/AuthContext";
 import { ArrowRight, CheckCircle } from "lucide-react";
 
@@ -14,7 +15,7 @@ export default function Community() {
           Join our growing ecosystem of creators, developers, and innovators. 
           Connect with like-minded individuals and build the future together.
         </p>
-
+        
         {!user ? (
           <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-lg mx-auto">
             <h2 className="text-2xl font-bold text-white mb-4">Please login or create an account to join Aura Community ACT.</h2>
@@ -59,6 +60,7 @@ export default function Community() {
         )}
       </div>
 
+      <EventCalendar />
       <CommunitySection />
     </div>
   );

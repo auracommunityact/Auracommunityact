@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { supabase, CommunityApplication } from '../../lib/supabase';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Download } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading } = useAuth();
@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const [data, setData] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
+  const [viewingApp, setViewingApp] = useState<CommunityApplication | null>(null);
 
   useEffect(() => {
     if (isAdmin) {
@@ -248,18 +249,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="py-4 flex flex-wrap gap-2">
-                        {item.status === 'pending' && (
-                          <button onClick={() => handleUpdateAppStatus(item.id, item.user_id, 'under_review')} className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30">Review</button>
-                        )}
-                        {(item.status === 'pending' || item.status === 'under_review') && (
-                          <>
-                            <button onClick={() => { if(window.confirm('Approve?')) handleUpdateAppStatus(item.id, item.user_id, 'approved') }} className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">Approve</button>
-                            <button onClick={() => { 
-                              const reason = window.prompt('Rejection Reason (optional):');
-                              if(reason !== null) handleUpdateAppStatus(item.id, item.user_id, 'rejected', reason);
-                            }} className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30">Reject</button>
-                          </>
-                        )}
+                        <button onClick={() => setViewingApp(item)} className="text-xs bg-white/10 text-white px-3 py-1 rounded hover:bg-white/20">View</button>
                       </td>
                     </>
                   )}
@@ -285,6 +275,103 @@ export default function AdminDashboard() {
           </table>
         )}
       </div>
+
+      {viewingApp && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-[#111] border border-white/10 rounded-3xl w-full max-w-4xl p-8 relative my-8">
+            <button 
+              onClick={() => setViewingApp(null)}
+              className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <h2 className="text-2xl font-bold text-white mb-6">Application Details</h2>
+            
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8 bg-white/5 p-4 rounded-2xl border border-white/5">
+              <div>
+                <span className="text-white/50 text-sm block mb-1">Current Status</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${viewingApp.status === 'approved' ? 'bg-green-500/20 text-green-400' : viewingApp.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                  {viewingApp.status.replace('_', ' ')}
+                </span>
+              </div>
+              
+              <div>
+                <span className="text-white/50 text-sm block mb-1">Change Status</span>
+                <select 
+                  className="bg-black/50 border border-white/10 text-white px-4 py-2 rounded-xl focus:outline-none focus:border-amber-500"
+                  value={viewingApp.status}
+                  onChange={(e) => {
+                    if (e.target.value === 'rejected') {
+                      const reason = window.prompt('Rejection Reason (optional):');
+                      if (reason !== null) {
+                        handleUpdateAppStatus(viewingApp.id, viewingApp.user_id, e.target.value, reason);
+                        setViewingApp({ ...viewingApp, status: e.target.value as any, rejection_reason: reason });
+                      }
+                    } else {
+                      handleUpdateAppStatus(viewingApp.id, viewingApp.user_id, e.target.value);
+                      setViewingApp({ ...viewingApp, status: e.target.value as any });
+                    }
+                  }}
+                >
+                  <option value="under_review">Under Review</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-white/80">
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-white border-b border-white/10 pb-2">Basic Info</h3>
+                <div><span className="text-white/50 text-sm block">Full Name</span> {viewingApp.full_name}</div>
+                <div><span className="text-white/50 text-sm block">Username</span> @{viewingApp.username}</div>
+                <div><span className="text-white/50 text-sm block">Email</span> {viewingApp.email}</div>
+                <div><span className="text-white/50 text-sm block">Location</span> {viewingApp.city_state ? `${viewingApp.city_state}, ` : ''}{viewingApp.country}</div>
+                <div><span className="text-white/50 text-sm block">Age Group</span> {viewingApp.age_group}</div>
+                <div><span className="text-white/50 text-sm block">Application ID</span> <span className="font-mono text-sm">{viewingApp.id}</span></div>
+                <div><span className="text-white/50 text-sm block">Submitted</span> {new Date(viewingApp.submitted_at).toLocaleString()}</div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-white border-b border-white/10 pb-2">Professional Info</h3>
+                <div><span className="text-white/50 text-sm block">Role Applied As</span> {viewingApp.role}</div>
+                <div><span className="text-white/50 text-sm block">Skills & Interests</span> {viewingApp.skills_interests}</div>
+                <div><span className="text-white/50 text-sm block">Community Interests</span> {viewingApp.community_interests}</div>
+                
+                {(viewingApp.github || viewingApp.website || viewingApp.youtube || viewingApp.discord) && (
+                  <div className="pt-2">
+                    <span className="text-white/50 text-sm block mb-1">Links</span>
+                    <div className="flex flex-col gap-1">
+                      {viewingApp.github && <a href={viewingApp.github} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline break-all">GitHub: {viewingApp.github}</a>}
+                      {viewingApp.website && <a href={viewingApp.website} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline break-all">Website: {viewingApp.website}</a>}
+                      {viewingApp.youtube && <a href={viewingApp.youtube} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline break-all">YouTube: {viewingApp.youtube}</a>}
+                      {viewingApp.discord && <span>Discord: {viewingApp.discord}</span>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-6 text-white/80">
+              <h3 className="text-lg font-bold text-white border-b border-white/10 pb-2">Detailed Responses</h3>
+              <div>
+                <span className="text-white/50 text-sm block mb-1">Introduction</span>
+                <p className="bg-white/5 p-4 rounded-xl whitespace-pre-wrap">{viewingApp.introduction}</p>
+              </div>
+              <div>
+                <span className="text-white/50 text-sm block mb-1">Reason to Join</span>
+                <p className="bg-white/5 p-4 rounded-xl whitespace-pre-wrap">{viewingApp.reason_to_join}</p>
+              </div>
+              <div>
+                <span className="text-white/50 text-sm block mb-1">Contribution</span>
+                <p className="bg-white/5 p-4 rounded-xl whitespace-pre-wrap">{viewingApp.contribution}</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -24,6 +24,7 @@ export type Profile = {
   status: 'not_applied' | 'pending' | 'under_review' | 'approved' | 'rejected';
   created_at: string;
   avatar_url?: string;
+  banner_url?: string;
   is_admin?: boolean;
 };
 

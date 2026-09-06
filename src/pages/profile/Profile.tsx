@@ -26,11 +26,14 @@ export default function Profile() {
   return (
     <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-12">
       <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-amber-500/20 to-purple-600/20 relative"></div>
+        <div 
+          className="h-48 bg-gradient-to-r from-amber-500/20 to-purple-600/20 relative"
+          style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+        ></div>
         
         <div className="px-8 pb-8 relative">
-          <div className="flex justify-between items-end -mt-12 mb-6">
-            <div className="w-24 h-24 rounded-2xl bg-black border-4 border-[#050505] flex items-center justify-center overflow-hidden">
+          <div className="flex justify-between items-end -mt-16 mb-6">
+            <div className="w-32 h-32 rounded-2xl bg-black border-4 border-[#050505] flex items-center justify-center overflow-hidden">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.full_name || ''} className="w-full h-full object-cover" />
               ) : (
@@ -51,12 +54,27 @@ export default function Profile() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">About</h3>
-              {profile.about ? (
-                <p className="text-white/70">{profile.about}</p>
-              ) : (
-                <p className="text-white/30 italic">No bio provided yet.</p>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">About</h3>
+                {profile.about ? (
+                  <p className="text-white/70 whitespace-pre-wrap">{profile.about}</p>
+                ) : (
+                  <p className="text-white/30 italic">No bio provided yet.</p>
+                )}
+              </div>
+
+              {profile.skills_interests && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">Skills & Interests</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skills_interests.split(',').map((skill, index) => (
+                      <span key={index} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-sm text-white/80">
+                        {skill.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
@@ -65,7 +83,7 @@ export default function Profile() {
               <ul className="space-y-3 text-white/70">
                 <li className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-amber-500" />
-                  {profile.email}
+                  {profile.email || user.email}
                 </li>
                 <li className="flex items-center gap-3">
                   <MapPin className="w-5 h-5 text-amber-500" />
@@ -77,7 +95,7 @@ export default function Profile() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-amber-500" />
-                  Joined {new Date(profile.created_at).toLocaleDateString()}
+                  Joined {new Date(user.created_at || profile.created_at).toLocaleDateString()}
                 </li>
               </ul>
             </div>
