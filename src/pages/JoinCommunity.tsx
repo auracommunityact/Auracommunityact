@@ -35,7 +35,7 @@ export default function JoinCommunity() {
 
   if (loading) return <div className="flex-1 flex items-center justify-center">Loading...</div>;
   if (!user || !profile) return <Navigate to="/login" replace />;
-  if (['pending', 'under_review', 'approved'].includes(profile.status)) {
+  if (['pending', 'under_review', 'accepted', 'member'].includes(profile.status)) {
     return <Navigate to="/my-application" replace />;
   }
 

@@ -1,9 +1,25 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { Navigate, Link } from 'react-router-dom';
-import { User as UserIcon, Calendar, MapPin, Briefcase, Mail } from 'lucide-react';
+import { User as UserIcon, Calendar, MapPin, Briefcase, Mail, AppWindow } from 'lucide-react';
 
 export default function Profile() {
   const { user, profile, loading } = useAuth();
+  const [appAccess, setAppAccess] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user && profile?.status === 'member') {
+      supabase
+        .from('member_app_access')
+        .select('*, aura_apps(*)')
+        .eq('member_id', user.id)
+        .eq('status', 'active')
+        .then(({ data }) => {
+          if (data) setAppAccess(data);
+        });
+    }
+  }, [user, profile]);
 
   if (loading) {
     return <div className="flex-1 flex items-center justify-center">Loading...</div>;
@@ -15,11 +31,9 @@ export default function Profile() {
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'approved': return <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Approved Member</span>;
-      case 'pending': return <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Application Pending</span>;
+      case 'member': return <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Member</span>;
       case 'under_review': return <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Under Review</span>;
-      case 'rejected': return <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Rejected</span>;
-      default: return <span className="bg-white/10 text-white/70 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Not Applied</span>;
+      default: return <span className="bg-white/10 text-white/70 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">User</span>;
     }
   };
 
@@ -100,6 +114,27 @@ export default function Profile() {
               </ul>
             </div>
           </div>
+
+          {profile.status === 'member' && (
+            <div className="mt-8 pt-8 border-t border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <AppWindow className="w-5 h-5 text-amber-500" />
+                Assigned Working Apps
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {appAccess.length > 0 ? (
+                  appAccess.map(a => (
+                    <div key={a.id} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
+                      <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                      <span className="text-white font-medium">{a.aura_apps?.name}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-white/40 italic text-sm">No working apps have been assigned yet.</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

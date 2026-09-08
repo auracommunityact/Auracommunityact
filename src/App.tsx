@@ -21,6 +21,7 @@ import ApplicationDashboard from "./pages/profile/ApplicationDashboard";
 import JoinCommunity from "./pages/JoinCommunity";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MembersDashboard from "./pages/members/MembersDashboard";
+import Guidelines from "./pages/Guidelines";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
+            <Route path="guidelines" element={<Guidelines />} />
             
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />

@@ -21,11 +21,28 @@ export type Profile = {
   role: string | null;
   skills_interests: string | null;
   about: string | null;
-  status: 'not_applied' | 'pending' | 'under_review' | 'approved' | 'rejected';
+  status: 'user' | 'not_applied' | 'pending' | 'under_review' | 'accepted' | 'rejected' | 'member';
   created_at: string;
   avatar_url?: string;
   banner_url?: string;
   is_admin?: boolean;
+};
+
+export type AuraApp = {
+  id: string;
+  name: string;
+  created_at: string;
+};
+
+export type MemberAppAccess = {
+  id: string;
+  member_id: string;
+  app_id: string;
+  assigned_by: string;
+  status: 'active' | 'revoked';
+  created_at: string;
+  updated_at: string;
+  aura_apps?: AuraApp;
 };
 
 export type Event = {
@@ -60,7 +77,7 @@ export type CommunityApplication = {
   instagram: string | null;
   github: string | null;
   website: string | null;
-  status: 'pending' | 'under_review' | 'approved' | 'rejected';
+  status: 'pending' | 'under_review' | 'accepted' | 'rejected';
   rejection_reason: string | null;
   admin_notes: string | null;
   submitted_at: string;

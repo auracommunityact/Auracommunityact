@@ -40,7 +40,7 @@ export default function ApplicationDashboard() {
 
   const getStatusColor = (status: string) => {
     switch(status) {
-      case 'approved': return 'text-green-400 bg-green-500/10 border-green-500/20';
+      case 'accepted': return 'text-green-400 bg-green-500/10 border-green-500/20';
       case 'rejected': return 'text-red-400 bg-red-500/10 border-red-500/20';
       case 'under_review': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
       default: return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20';
@@ -49,7 +49,7 @@ export default function ApplicationDashboard() {
 
   const getStatusHeading = (status: string) => {
     switch(status) {
-      case 'approved': return '🎉 Application Approved';
+      case 'accepted': return '🎉 Application Accepted';
       case 'rejected': return 'Application Rejected';
       case 'under_review': return 'Under Review';
       default: return status.replace('_', ' ');
@@ -58,7 +58,7 @@ export default function ApplicationDashboard() {
 
   const getStatusMessage = (status: string) => {
     switch(status) {
-      case 'approved': return 'Congratulations! Your application has been approved. You are now an Aura Community ACT Member.';
+      case 'accepted': return 'Congratulations! Your application has been accepted. You are now a Member of Aura Community ACT.';
       case 'rejected': return 'Your application was not approved at this time.';
       case 'under_review': return 'An administrator is currently reviewing your application.';
       default: return 'An administrator is currently reviewing your application.';

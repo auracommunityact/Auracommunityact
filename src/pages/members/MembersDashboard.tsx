@@ -11,7 +11,7 @@ export default function MembersDashboard() {
 
   useEffect(() => {
     async function fetchRSVPs() {
-      if (user && profile?.status === 'approved') {
+      if (user && profile?.status === 'member') {
         try {
           // Fetch events the user has RSVPed to
           const { data, error } = await supabase
@@ -42,7 +42,7 @@ export default function MembersDashboard() {
 
   if (!user) return <Navigate to="/login" replace />;
   
-  if (profile?.status !== 'approved') {
+  if (profile?.status !== 'member') {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <div className="w-20 h-20 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mb-6">
@@ -83,7 +83,7 @@ export default function MembersDashboard() {
       description: "Review our updated policies, code of conduct, and member expectations.",
       icon: <BookOpen className="w-6 h-6 text-amber-500" />,
       action: "Read Docs",
-      link: "#"
+      link: "#/guidelines"
     }
   ];
 

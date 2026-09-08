@@ -13,7 +13,7 @@ export function MemberSpotlightSection() {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('status', 'approved')
+          .eq('status', 'member')
           .order('created_at', { ascending: true });
         
         if (error) throw error;

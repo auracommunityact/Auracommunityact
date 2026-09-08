@@ -30,7 +30,7 @@ export default function Community() {
           </div>
         ) : (
           <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-lg mx-auto">
-            {profile?.status === 'approved' ? (
+            {profile?.status === 'member' ? (
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-4">
                   <CheckCircle className="w-8 h-8" />

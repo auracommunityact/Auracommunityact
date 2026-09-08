@@ -56,6 +56,11 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
+                <Link to="/guidelines" className="text-sm text-white/60 hover:text-amber-500 transition-colors">
+                  Community Guidelines
+                </Link>
+              </li>
+              <li>
                 <Link to="/privacy" className="text-sm text-white/60 hover:text-amber-500 transition-colors">
                   Privacy Policy
                 </Link>

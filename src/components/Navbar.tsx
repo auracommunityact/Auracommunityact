@@ -32,7 +32,7 @@ export default function Navbar() {
         { title: "Community", href: "/community" },
       ];
       
-      if (profile?.status === 'approved') {
+      if (profile?.status === 'member') {
         loggedInLinks.push({ title: "Members Area", href: "/members" });
       } else {
         loggedInLinks.push({ title: "My Application", href: "/my-application" });
