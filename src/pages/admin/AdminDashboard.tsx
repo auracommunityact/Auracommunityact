@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase, CommunityApplication } from '../../lib/supabase';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Download, X } from 'lucide-react';
+import { Download, X, Mail, CheckCircle2, Archive, Trash2, Reply } from 'lucide-react';
 import AdminEvents from './AdminEvents';
 
 export default function AdminDashboard() {
@@ -28,6 +28,46 @@ export default function AdminDashboard() {
   const [appAccess, setAppAccess] = useState<any[]>([]);
   const [managingMember, setManagingMember] = useState<any | null>(null);
   const [selectedAccess, setSelectedAccess] = useState<Record<string, string>>({});
+
+  
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [viewingMessage, setViewingMessage] = useState<any | null>(null);
+  const [messageSearch, setMessageSearch] = useState('');
+  const [messageFilter, setMessageFilter] = useState('all');
+  
+    const [realtimeTrigger, setRealtimeTrigger] = useState(0);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    
+    const fetchUnreadCount = async () => {
+      const { count } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'unread');
+      setUnreadMessageCount(count || 0);
+    };
+    fetchUnreadCount();
+
+    const channel = supabase.channel('contact_messages_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages' }, payload => {
+        fetchUnreadCount();
+        setRealtimeTrigger(prev => prev + 1);
+        toast('New message received', { icon: '📬' });
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
+  
+  useEffect(() => {
+    if (activeTab === 'messages' && realtimeTrigger > 0) {
+      fetchData('messages');
+    }
+  }, [realtimeTrigger]);
+
 
   useEffect(() => {
     if (isAdmin) {
@@ -60,6 +100,52 @@ export default function AdminDashboard() {
       toast.error(err.message || 'Error fetching data');
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  
+  const updateMessageStatus = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      setData(prev => prev.map(m => m.id === id ? { ...m, status: newStatus } : m));
+      
+      if (viewingMessage && viewingMessage.id === id) {
+        setViewingMessage({ ...viewingMessage, status: newStatus });
+      }
+      
+      // refetch unread count will be handled by realtime subscription if active, but let's do it manually just in case
+      const { count } = await supabase.from('contact_messages').select('*', { count: 'exact', head: true }).eq('status', 'unread');
+      setUnreadMessageCount(count || 0);
+      
+      toast.success(`Message marked as ${newStatus}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Error updating message status');
+    }
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!window.confirm("Are you sure you want to permanently delete this message?")) return;
+    try {
+      const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+      if (error) throw error;
+      setData(prev => prev.filter(m => m.id !== id));
+      if (viewingMessage && viewingMessage.id === id) setViewingMessage(null);
+      toast.success('Message deleted successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Error deleting message');
+    }
+  };
+  
+  const openMessage = async (msg: any) => {
+    setViewingMessage(msg);
+    if (msg.status === 'unread') {
+      await updateMessageStatus(msg.id, 'read');
     }
   };
 
@@ -232,6 +318,20 @@ export default function AdminDashboard() {
   if (loading) return <div className="flex-1 flex items-center justify-center">Loading...</div>;
   if (!user || !isAdmin) return <Navigate to="/" replace />;
 
+    const filteredData = data.filter(item => {
+    if (activeTab === 'messages') {
+      if (messageFilter !== 'all' && item.status !== messageFilter) return false;
+      if (messageSearch) {
+        const search = messageSearch.toLowerCase();
+        return (item.name?.toLowerCase().includes(search) || 
+                item.email?.toLowerCase().includes(search) || 
+                item.subject?.toLowerCase().includes(search) || 
+                item.message?.toLowerCase().includes(search));
+      }
+    }
+    return true;
+  });
+
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -251,12 +351,40 @@ export default function AdminDashboard() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-full font-semibold capitalize whitespace-nowrap ${activeTab === tab ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:text-white'}`}
+            className={`relative px-4 py-2 rounded-full font-semibold capitalize whitespace-nowrap ${activeTab === tab ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:text-white'}`}
           >
             {tab}
+            {tab === 'messages' && unreadMessageCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full border border-[#111]">
+                {unreadMessageCount}
+              </span>
+            )}
           </button>
         ))}
       </div>
+
+            {activeTab === 'messages' && (
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <input 
+            type="text" 
+            placeholder="Search messages..." 
+            value={messageSearch}
+            onChange={e => setMessageSearch(e.target.value)}
+            className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500"
+          />
+          <select 
+            value={messageFilter}
+            onChange={e => setMessageFilter(e.target.value)}
+            className="bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500"
+          >
+            <option value="all">All Messages</option>
+            <option value="unread">Unread</option>
+            <option value="read">Read</option>
+            <option value="replied">Replied</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+      )}
 
       {activeTab === 'applications' && selectedApps.size > 0 && (
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -318,18 +446,19 @@ export default function AdminDashboard() {
                     <th className="pb-3 pr-4">Joined</th>
                   </>
                 )}
-                {activeTab === 'messages' && (
+                                {activeTab === 'messages' && (
                   <>
-                    <th className="pb-3 pr-4">Name</th>
-                    <th className="pb-3 pr-4">Email</th>
+                    <th className="pb-3 pr-4">Sender</th>
                     <th className="pb-3 pr-4">Subject</th>
-                    <th className="pb-3 pr-4">Message</th>
+                    <th className="pb-3 pr-4">Preview</th>
+                    <th className="pb-3 pr-4">Status</th>
+                    <th className="pb-3 pr-4">Date</th>
                   </>
                 )}
               </tr>
             </thead>
             <tbody>
-              {data.map((item: any) => (
+              {filteredData.map((item: any) => (
                 <tr key={item.id} className="border-b border-white/5 hover:bg-white/5">
                   {activeTab === 'applications' && (
                     <>
@@ -404,12 +533,36 @@ export default function AdminDashboard() {
                       <td className="py-4 pr-4">{new Date(item.created_at).toLocaleDateString()}</td>
                     </>
                   )}
-                  {activeTab === 'messages' && (
+                                    {activeTab === 'messages' && (
                     <>
-                      <td className="py-4 pr-4">{item.name}</td>
-                      <td className="py-4 pr-4">{item.email}</td>
-                      <td className="py-4 pr-4">{item.subject}</td>
-                      <td className="py-4 pr-4 max-w-xs truncate">{item.message}</td>
+                      <td className="py-4 pr-4 cursor-pointer" onClick={() => openMessage(item)}>
+                        <div className="flex items-center gap-2">
+                           {item.status === 'unread' && <div className="w-2 h-2 rounded-full bg-amber-500"></div>}
+                           <div>
+                             <div className={`font-medium ${item.status === 'unread' ? 'text-white' : 'text-white/70'}`}>{item.name}</div>
+                             <div className="text-white/40 text-xs">{item.email}</div>
+                           </div>
+                        </div>
+                      </td>
+                      <td className={`py-4 pr-4 cursor-pointer max-w-[150px] truncate ${item.status === 'unread' ? 'text-white font-medium' : 'text-white/70'}`} onClick={() => openMessage(item)}>
+                        {item.subject}
+                      </td>
+                      <td className="py-4 pr-4 cursor-pointer text-white/50 max-w-[200px] truncate" onClick={() => openMessage(item)}>
+                        {item.message}
+                      </td>
+                      <td className="py-4 pr-4 cursor-pointer" onClick={() => openMessage(item)}>
+                        <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${
+                          item.status === 'unread' ? 'bg-amber-500/20 text-amber-400' :
+                          item.status === 'replied' ? 'bg-green-500/20 text-green-400' :
+                          item.status === 'archived' ? 'bg-white/10 text-white/40' :
+                          'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="py-4 pr-4 cursor-pointer text-white/50 whitespace-nowrap text-sm" onClick={() => openMessage(item)}>
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </td>
                     </>
                   )}
                 </tr>
@@ -502,6 +655,93 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+
+      {viewingMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-[#111] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">{viewingMessage.subject}</h2>
+                <div className="flex items-center gap-3 text-sm">
+                  <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
+                    viewingMessage.status === 'unread' ? 'bg-amber-500/20 text-amber-400' :
+                    viewingMessage.status === 'replied' ? 'bg-green-500/20 text-green-400' :
+                    viewingMessage.status === 'archived' ? 'bg-white/10 text-white/40' :
+                    'bg-blue-500/20 text-blue-400'
+                  }`}>
+                    {viewingMessage.status}
+                  </span>
+                  <span className="text-white/40">{new Date(viewingMessage.created_at).toLocaleString()}</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setViewingMessage(null)}
+                className="text-white/50 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                   <Mail className="w-5 h-5 text-white/50" />
+                 </div>
+                 <div>
+                   <div className="text-white font-medium">{viewingMessage.name}</div>
+                   <div className="text-white/50 text-sm">{viewingMessage.email}</div>
+                 </div>
+               </div>
+               <a 
+                 href={`mailto:${viewingMessage.email}?subject=Re: ${viewingMessage.subject}`}
+                 onClick={() => {
+                   if (viewingMessage.status !== 'replied') {
+                     updateMessageStatus(viewingMessage.id, 'replied');
+                   }
+                 }}
+                 className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-colors"
+               >
+                 <Reply className="w-4 h-4" /> Reply
+               </a>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[50vh]">
+              <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
+                {viewingMessage.message}
+              </p>
+            </div>
+            
+            <div className="p-4 border-t border-white/10 bg-black/50 flex flex-wrap gap-2 justify-between items-center">
+               <div className="flex gap-2">
+                 {viewingMessage.status !== 'unread' && (
+                   <button onClick={() => updateMessageStatus(viewingMessage.id, 'unread')} className="px-3 py-1.5 text-xs font-semibold rounded bg-white/5 hover:bg-white/10 text-white transition-colors">
+                     Mark Unread
+                   </button>
+                 )}
+                 {viewingMessage.status !== 'read' && viewingMessage.status !== 'unread' && (
+                   <button onClick={() => updateMessageStatus(viewingMessage.id, 'read')} className="px-3 py-1.5 text-xs font-semibold rounded bg-white/5 hover:bg-white/10 text-white transition-colors">
+                     Mark Read
+                   </button>
+                 )}
+                 {viewingMessage.status !== 'archived' ? (
+                   <button onClick={() => updateMessageStatus(viewingMessage.id, 'archived')} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded bg-white/5 hover:bg-white/10 text-white transition-colors">
+                     <Archive className="w-3 h-3" /> Archive
+                   </button>
+                 ) : (
+                   <button onClick={() => updateMessageStatus(viewingMessage.id, 'read')} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded bg-white/5 hover:bg-white/10 text-white transition-colors">
+                     Restore
+                   </button>
+                 )}
+               </div>
+               
+               <button onClick={() => deleteMessage(viewingMessage.id)} className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors">
+                 <Trash2 className="w-3 h-3" /> Delete
+               </button>
+            </div>
           </div>
         </div>
       )}

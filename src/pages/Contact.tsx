@@ -7,22 +7,45 @@ import { toast } from "react-hot-toast";
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (status === "submitting") return;
     setStatus("submitting");
     
     const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const subject = formData.get("subject") as string;
-    const message = formData.get("message") as string;
+    const name = (formData.get("name") as string).trim();
+    const email = (formData.get("email") as string).trim();
+    const subject = (formData.get("subject") as string).trim();
+    const message = (formData.get("message") as string).trim();
+
+    if (!name || !email || !subject || !message) {
+      toast.error("Please fill in all fields.");
+      setStatus("idle");
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      setStatus("idle");
+      return;
+    }
+    
+    if (message.length < 10) {
+      toast.error("Message is too short. Please provide more details.");
+      setStatus("idle");
+      return;
+    }
 
     try {
       const { error } = await supabase.from("contact_messages").insert([{
         name, email, subject, message
       }]);
+      
       if (error) throw error;
+      
       setStatus("success");
+      toast.success("Your message has been sent successfully.");
     } catch (error: any) {
       toast.error(error.message || "Failed to send message");
       setStatus("idle");
