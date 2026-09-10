@@ -20,7 +20,6 @@ import Settings from "./pages/profile/Settings";
 import ApplicationDashboard from "./pages/profile/ApplicationDashboard";
 import JoinCommunity from "./pages/JoinCommunity";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AuraAI from "./pages/AuraAI";
 import MembersDashboard from "./pages/members/MembersDashboard";
 import Guidelines from "./pages/Guidelines";
 
@@ -49,7 +48,6 @@ export default function App() {
             <Route path="my-application" element={<ApplicationDashboard />} />
             <Route path="join-community" element={<JoinCommunity />} />
             <Route path="admin/*" element={<AdminDashboard />} />
-            <Route path="ai" element={<AuraAI />} />
             <Route path="members" element={<MembersDashboard />} />
           </Route>
         </Routes>
