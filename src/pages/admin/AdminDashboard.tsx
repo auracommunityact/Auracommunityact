@@ -347,9 +347,9 @@ export default function AdminDashboard() {
       </div>
       
       <div className="flex gap-4 mb-8 border-b border-white/10 pb-4 overflow-x-auto">
-        {['applications', 'members', 'users', 'messages', 'events'].map(tab => (
+        {['applications', 'members', 'users', 'messages', 'events', 'ai_settings'].map(tab => (
           <button
-            key={tab}
+            key={tab === 'ai_settings' ? 'AI Settings' : tab}
             onClick={() => setActiveTab(tab)}
             className={`relative px-4 py-2 rounded-full font-semibold capitalize whitespace-nowrap ${activeTab === tab ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:text-white'}`}
           >
@@ -399,6 +399,49 @@ export default function AdminDashboard() {
             <button onClick={() => triggerBulkUpdate('rejected')} className="text-sm bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 font-semibold transition-colors">
               Reject Selected
             </button>
+          </div>
+        </div>
+      )}
+
+      
+      {activeTab === 'ai_settings' && (
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-10 max-w-3xl">
+          <h2 className="text-2xl font-bold text-white mb-6">Aura AI Settings</h2>
+          <div className="space-y-6">
+            <div className="p-6 bg-black/50 border border-white/10 rounded-2xl">
+              <h3 className="text-lg font-bold text-white mb-2">Enable AI Features</h3>
+              <p className="text-white/50 text-sm mb-4">Turn Aura AI on or off for the community.</p>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative">
+                  <input type="checkbox" className="sr-only peer" defaultChecked={true} />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                </div>
+                <span className="text-white font-medium">Aura AI is Active</span>
+              </label>
+            </div>
+            
+            <div className="p-6 bg-black/50 border border-white/10 rounded-2xl">
+              <h3 className="text-lg font-bold text-white mb-2">Kits.AI Configuration</h3>
+              <p className="text-white/50 text-sm mb-4">Manage the voice model used by Aura AI.</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1">Voice Model ID</label>
+                  <div className="flex gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Enter Kits.AI Voice ID"
+                      defaultValue="configured_in_env"
+                      disabled
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white/50 cursor-not-allowed"
+                    />
+                  </div>
+                  <p className="text-xs text-white/40 mt-2">
+                    For security, API Keys and Voice IDs are managed via server environment variables (.env).
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
