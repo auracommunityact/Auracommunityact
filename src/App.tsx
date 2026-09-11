@@ -22,6 +22,7 @@ import JoinCommunity from "./pages/JoinCommunity";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MembersDashboard from "./pages/members/MembersDashboard";
 import Guidelines from "./pages/Guidelines";
+import AuraAI from "./pages/AuraAI";
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="join-community" element={<JoinCommunity />} />
             <Route path="admin/*" element={<AdminDashboard />} />
             <Route path="members" element={<MembersDashboard />} />
+            <Route path="aura-ai" element={<AuraAI />} />
           </Route>
         </Routes>
       </Router>

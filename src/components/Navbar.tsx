@@ -20,6 +20,7 @@ export default function Navbar() {
 
   const getNavLinks = () => {
     const baseLinks = [
+      { title: "🤖 Aura AI", href: "/aura-ai" },
       { title: "Home", href: "/" },
       { title: "Community", href: "/community" },
       { title: "About", href: "/about" },
@@ -28,6 +29,7 @@ export default function Navbar() {
 
     if (user) {
       const loggedInLinks = [
+        { title: "🤖 Aura AI", href: "/aura-ai" },
         { title: "Home", href: "/" },
         { title: "Community", href: "/community" },
       ];
