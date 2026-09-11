@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+const fs = require('fs');
+
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://auracommunityact.github.io/Auracommunityact/</loc>
@@ -55,4 +57,8 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-</urlset>
+</urlset>`;
+
+// Write as raw utf-8, no BOM
+fs.writeFileSync('public/sitemap.xml', sitemap, { encoding: 'utf8' });
+console.log('sitemap.xml generated successfully.');
