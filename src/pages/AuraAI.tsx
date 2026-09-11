@@ -1,82 +1,59 @@
-import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AuraAI() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
-  const fallbackTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Prevent double scrolling on the body while on this full-screen route
   useEffect(() => {
-    document.body.style.overflow = "hidden";
+    const scriptId = 'kit-ai-v2-loader';
     
-    // Fallback: If iframe doesn't load within 8 seconds (e.g. CSP block), show error and inject official JS widget
-    fallbackTimeout.current = setTimeout(() => {
-      if (isLoading) {
-        setLoadError(true);
-        const script = document.createElement("script");
-        script.src = "https://kit.ai/widget/v1/kit-chat.min.js";
-        script.setAttribute("data-bot-id", "2zpYbWGdPektFJou9huVVTGA");
-        script.async = true;
-        document.body.appendChild(script);
-      }
-    }, 8000);
+    // Inject the V2 script provided by Kit.ai if it's not already there
+    if (!document.getElementById(scriptId)) {
+      const s = document.createElement("script");
+      s.id = scriptId;
+      s.async = true;
+      s.src = "https://kit.ai/widget/v2/kit-loader.js";
+      s.setAttribute("data-bot-id", "2zpYbWGdPektFJou9huVVTGA");
+      s.setAttribute("data-api-origin", "https://kit.ai");
+      s.setAttribute("data-brand-color", "#CD6F49"); // Custom brand color from snippet
+      s.setAttribute("data-position", "right");
+      document.body.appendChild(s);
+    }
 
     return () => {
-      document.body.style.overflow = "";
-      if (fallbackTimeout.current) clearTimeout(fallbackTimeout.current);
+      // We don't remove the script on unmount because the user might want 
+      // the widget to persist while browsing, but if you want to strictly 
+      // limit it to this page, you can uncomment the following lines.
+      // 
+      // const script = document.getElementById(scriptId);
+      // if (script) script.remove();
+      // // Kit.ai v2 widget exposes cleanup logic
+      // if ((window as any).kitChat && (window as any).kitChat.destroy) {
+      //   (window as any).kitChat.destroy();
+      // }
     };
-  }, [isLoading]);
+  }, []);
 
   return (
-    <div className="pt-16 h-[100dvh] flex flex-col bg-[#050505] w-full">
-      {/* Sub-header for back navigation */}
-      <div className="flex items-center px-4 py-3 bg-black/40 border-b border-white/5 shrink-0 z-10">
+    <div className="pt-24 pb-12 min-h-[100dvh] flex flex-col items-center justify-center bg-[#050505] px-4 w-full">
+      <div className="max-w-md w-full bg-white/[0.02] border border-white/10 rounded-3xl p-8 text-center backdrop-blur-sm shadow-2xl shadow-[#CD6F49]/10">
+        <div className="w-20 h-20 bg-[#CD6F49]/10 border border-[#CD6F49]/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner shadow-[#CD6F49]/20">
+          <MessageSquare className="w-10 h-10 text-[#CD6F49]" />
+        </div>
+        
+        <h1 className="text-3xl font-bold text-white mb-3">Aura AI Launched</h1>
+        <p className="text-white/60 mb-8 leading-relaxed text-sm">
+          The official Aura AI floating assistant is now active. Click the chat bubble icon in the <strong className="text-[#CD6F49]">bottom right corner</strong> of your screen to start a conversation.
+        </p>
+        
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full shadow-md"
+          className="inline-flex items-center gap-2 text-white hover:text-white font-medium transition-all bg-[#CD6F49] hover:bg-[#b55c3a] px-6 py-3 rounded-full shadow-lg shadow-[#CD6F49]/20"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Aura Community
+          Back to Community
         </button>
-      </div>
-
-      {/* Main embed container */}
-      <div className="relative flex-1 w-full bg-black">
-        {isLoading && !loadError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#050505]">
-            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
-            <p className="text-white/50 text-sm animate-pulse font-medium">Connecting to Aura AI...</p>
-          </div>
-        )}
-
-        {loadError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#050505] p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-amber-500 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Connection Taking Longer Than Expected</h3>
-            <p className="text-white/50 text-sm max-w-md">
-              The full-screen experience couldn't be loaded directly. We've launched the official Aura AI floating widget as a fallback. Please check the bottom right of your screen.
-            </p>
-          </div>
-        )}
-        
-        {/* Kit.ai iframe embed 
-            Uses the bot's public URL embedded within the site.
-            If iframe restrictions are ever applied by Kit.ai in the future, 
-            the JS embed fallback triggers automatically.
-        */}
-        <iframe
-          src="https://kit.ai/bot/2zpYbWGdPektFJou9huVVTGA?embed=true"
-          className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          title="Aura AI Powered by Kit.ai"
-          allow="microphone"
-          onLoad={() => {
-            setIsLoading(false);
-            if (fallbackTimeout.current) clearTimeout(fallbackTimeout.current);
-          }}
-        />
       </div>
     </div>
   );
