@@ -214,7 +214,8 @@ export function ProjectsSection() {
       (project) =>
         project.name.toLowerCase().includes(lowerQuery) ||
         project.description.toLowerCase().includes(lowerQuery) ||
-        project.category.toLowerCase().includes(lowerQuery)
+        project.category.toLowerCase().includes(lowerQuery) ||
+        (project as any).tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
   }, [searchQuery]);
 
@@ -281,19 +282,43 @@ export function ProjectsSection() {
             </h3>
             <p className="text-sm text-white/50 leading-relaxed flex-1 mb-6">{project.description}</p>
             
-            {project.status === 'Coming Soon' ? (
-              <span className="flex items-center gap-2 text-xs font-semibold text-white/40 mt-auto w-fit">
-                Coming Soon
-              </span>
-            ) : (project as any).link && (project as any).link !== '#' ? (
-              <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
-                Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </a>
-            ) : (
-              <button className="flex items-center gap-2 text-xs font-semibold text-white/70 group-hover:text-amber-500 transition-colors mt-auto w-fit">
-                Visit Project <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </button>
-            )}
+            <div className="flex flex-wrap items-center gap-4 mt-auto">
+              {project.status === 'Coming Soon' ? (
+                <span className="flex items-center gap-2 text-xs font-semibold text-white/40 w-fit">
+                  Coming Soon
+                </span>
+              ) : (
+                <>
+                  {(project as any).link && (project as any).link !== '#' ? (
+                    <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
+                      Visit Project <ArrowRight className="w-3 h-3 transition-transform" />
+                    </a>
+                  ) : (project as any).link === '#' && (
+                    <button className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
+                      Visit Project <ArrowRight className="w-3 h-3 transition-transform" />
+                    </button>
+                  )}
+                  
+                  {(project as any).apkLink && (
+                    <a 
+                      href={(project as any).apkLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onClick={(e) => {
+                        // Informational message for Android users before navigating
+                        const isAndroid = /android/i.test(navigator.userAgent);
+                        if (isAndroid) {
+                          alert("You are downloading an APK file. Your Android device may ask you to allow installation from unknown sources (your browser or file manager) to install this app.");
+                        }
+                      }}
+                      className="flex items-center gap-2 text-xs font-bold text-black bg-amber-500 hover:bg-amber-400 px-4 py-2 rounded-full transition-colors w-fit shadow-lg shadow-amber-500/20"
+                    >
+                      Install ACode
+                    </a>
+                  )}
+                </>
+              )}
+            </div>
           </motion.div>
         ))}
       </div>
