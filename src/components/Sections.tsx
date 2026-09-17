@@ -290,9 +290,15 @@ export function ProjectsSection() {
               ) : (
                 <>
                   {(project as any).link && (project as any).link !== '#' ? (
-                    <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
-                      Visit Project <ArrowRight className="w-3 h-3 transition-transform" />
-                    </a>
+                    (project as any).link.startsWith('/') ? (
+                      <Link to={(project as any).link} className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
+                        Visit Project <ArrowRight className="w-3 h-3 transition-transform" />
+                      </Link>
+                    ) : (
+                      <a href={(project as any).link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
+                        Visit Project <ArrowRight className="w-3 h-3 transition-transform" />
+                      </a>
+                    )
                   ) : (project as any).link === '#' && (
                     <button className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-amber-500 transition-colors w-fit">
                       Visit Project <ArrowRight className="w-3 h-3 transition-transform" />

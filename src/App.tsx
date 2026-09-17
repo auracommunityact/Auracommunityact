@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import MembersDashboard from "./pages/members/MembersDashboard";
 import Guidelines from "./pages/Guidelines";
 import AuraAI from "./pages/AuraAI";
+import MissionGTAMobile from "./pages/MissionGTAMobile";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="projects/mission-gta-mobile" element={<MissionGTAMobile />} />
             <Route path="services" element={<Services />} />
             <Route path="community" element={<Community />} />
             <Route path="founder" element={<Founder />} />
