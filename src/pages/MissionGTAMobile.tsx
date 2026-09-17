@@ -1,13 +1,52 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Cpu, Smartphone, LayoutDashboard, Monitor, ChevronRight } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowLeft, Cpu, Smartphone, LayoutDashboard, Monitor, ChevronRight, X, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { supabase, ProjectGallery, ProjectUpdate, ProjectPerformance } from "../lib/supabase";
 
 export default function MissionGTAMobile() {
+  const [gallery, setGallery] = useState<ProjectGallery[]>([]);
+  const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
+  const [performance, setPerformance] = useState<ProjectPerformance | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Mission GTA Mobile | Aura Community Act";
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const { data: galleryData } = await supabase
+        .from('project_galleries')
+        .select('*')
+        .eq('project_id', 'mission-gta-mobile')
+        .order('created_at', { ascending: false });
+        
+      if (galleryData) setGallery(galleryData);
+
+      const { data: updatesData } = await supabase
+        .from('project_updates')
+        .select('*')
+        .eq('project_id', 'mission-gta-mobile')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+        
+      if (updatesData) setUpdates(updatesData);
+
+      const { data: perfData } = await supabase
+        .from('project_performance')
+        .select('*')
+        .eq('project_id', 'mission-gta-mobile')
+        .single();
+        
+      if (perfData) setPerformance(perfData);
+
+    } catch (err) {
+      console.error("Failed to fetch project data", err);
+    }
+  };
 
   return (
     <div className="flex-1 w-full bg-[#050505] text-gray-200 selection:bg-green-500/30 relative">
@@ -176,19 +215,19 @@ export default function MissionGTAMobile() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-black/50 border border-white/5 p-4 rounded-xl">
                   <div className="text-xs text-gray-500 font-bold mb-2">FPS</div>
-                  <div className="text-sm font-medium text-green-400">Testing</div>
+                  <div className="text-sm font-medium text-green-400 break-words">{performance?.fps || 'Testing'}</div>
                 </div>
                 <div className="bg-black/50 border border-white/5 p-4 rounded-xl">
                   <div className="text-xs text-gray-500 font-bold mb-2">GPU</div>
-                  <div className="text-sm font-medium text-amber-400">Testing</div>
+                  <div className="text-sm font-medium text-amber-400 break-words">{performance?.gpu || 'Testing'}</div>
                 </div>
                 <div className="bg-black/50 border border-white/5 p-4 rounded-xl">
                   <div className="text-xs text-gray-500 font-bold mb-2">RAM</div>
-                  <div className="text-sm font-medium text-gray-400">Data N/A</div>
+                  <div className="text-sm font-medium text-gray-400 break-words">{performance?.ram || 'Data N/A'}</div>
                 </div>
                 <div className="bg-black/50 border border-white/5 p-4 rounded-xl">
                   <div className="text-xs text-gray-500 font-bold mb-2">Stability</div>
-                  <div className="text-sm font-medium text-blue-400">Testing</div>
+                  <div className="text-sm font-medium text-blue-400 break-words">{performance?.stability || 'Testing'}</div>
                 </div>
               </div>
             </div>
@@ -214,27 +253,105 @@ export default function MissionGTAMobile() {
       <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto w-full border-t border-white/5">
         <h2 className="text-2xl font-bold uppercase tracking-wide text-white border-l-4 border-green-500 pl-4 mb-8">Mission Gallery</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Placeholders for Gallery */}
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="aspect-video bg-[#111] border border-white/10 rounded-xl overflow-hidden relative group flex items-center justify-center">
+          {gallery.length > 0 ? gallery.map((img) => (
+            <div 
+              key={img.id} 
+              onClick={() => setSelectedImage(img.image_url)}
+              className="aspect-video bg-[#111] border border-white/10 rounded-xl overflow-hidden relative group cursor-pointer"
+            >
+              <img src={img.image_url} alt={img.title || ''} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <Monitor className="w-8 h-8 text-white/10" />
-              <span className="absolute bottom-4 left-4 text-xs font-bold text-white/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                Screenshot Placeholder 0{item}
-              </span>
             </div>
-          ))}
+          )) : (
+            /* Placeholders for Gallery */
+            [1, 2, 3].map((item) => (
+              <div key={item} className="aspect-video bg-[#111] border border-white/10 rounded-xl overflow-hidden relative group flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <Monitor className="w-8 h-8 text-white/10" />
+                <span className="absolute bottom-4 left-4 text-xs font-bold text-white/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Gallery Placeholder 0{item}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
       {/* Updates Section */}
       <section id="updates" className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto w-full border-t border-white/5">
         <h2 className="text-2xl font-bold uppercase tracking-wide text-white border-l-4 border-green-500 pl-4 mb-8">Mission Updates</h2>
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center backdrop-blur-sm">
-          <LayoutDashboard className="w-10 h-10 text-white/20 mx-auto mb-4" />
-          <p className="text-gray-400 font-medium">No development updates have been published yet.</p>
-        </div>
+        
+        {updates.length > 0 ? (
+          <div className="space-y-6">
+            {updates.map(update => (
+              <div key={update.id} className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+                {update.image_url && (
+                  <div className="md:w-1/3 aspect-video md:aspect-auto relative shrink-0">
+                    <img src={update.image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="p-6 md:p-8 flex-1 flex flex-col justify-center">
+                  <div className="text-green-500 font-bold tracking-widest text-xs uppercase mb-2">
+                    {new Date(update.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4">{update.title}</h3>
+                  <p className="text-gray-400 leading-relaxed mb-6 whitespace-pre-line">{update.description}</p>
+                  
+                  {update.links && update.links.length > 0 && (
+                    <div className="flex flex-wrap gap-3 mt-auto">
+                      {update.links.map((link, i) => (
+                        <a 
+                          key={i} 
+                          href={link.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" /> {link.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center backdrop-blur-sm">
+            <LayoutDashboard className="w-10 h-10 text-white/20 mx-auto mb-4" />
+            <p className="text-gray-400 font-medium">No development updates have been published yet.</p>
+          </div>
+        )}
       </section>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur flex items-center justify-center p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/50 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-colors"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <motion.img 
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              src={selectedImage} 
+              alt="Preview" 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" 
+              onClick={e => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Legal Note */}
       <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto w-full border-t border-white/5 mb-12">

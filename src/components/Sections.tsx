@@ -1,3 +1,6 @@
+import { useEffect, useState as useReactState } from "react";
+import { supabase, Project } from "../lib/supabase";
+
 import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
@@ -206,18 +209,54 @@ export function VisionSection() {
 
 export function ProjectsSection() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [dbProjects, setDbProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('published', true)
+          .eq('visible_on_home', true)
+          .order('display_order', { ascending: true });
+        if (!error && data) {
+          setDbProjects(data);
+        } else {
+          setDbProjects(siteConfig.projects);
+        }
+      } catch (err) {
+        setDbProjects(siteConfig.projects);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+
+    const channel = supabase.channel('public:projects')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
+        fetchProjects();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return siteConfig.projects;
+    const source = dbProjects.length > 0 ? dbProjects : siteConfig.projects;
+    if (!searchQuery.trim()) return source;
     const lowerQuery = searchQuery.toLowerCase();
-    return siteConfig.projects.filter(
-      (project) =>
+    return source.filter(
+      (project: any) =>
         project.name.toLowerCase().includes(lowerQuery) ||
-        project.description.toLowerCase().includes(lowerQuery) ||
-        project.category.toLowerCase().includes(lowerQuery) ||
-        (project as any).tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
+        (project.short_description || project.description || '').toLowerCase().includes(lowerQuery) ||
+        (project.category || '').toLowerCase().includes(lowerQuery) ||
+        project.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
-  }, [searchQuery]);
+  }, [searchQuery, dbProjects]);
 
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -280,7 +319,7 @@ export function ProjectsSection() {
                 />
               )}
             </h3>
-            <p className="text-sm text-white/50 leading-relaxed flex-1 mb-6">{project.description}</p>
+            <p className="text-sm text-white/50 leading-relaxed flex-1 mb-6">{project.short_description || project.description}</p>
             
             <div className="flex flex-wrap items-center gap-4 mt-auto">
               {project.status === 'Coming Soon' ? (
@@ -305,9 +344,9 @@ export function ProjectsSection() {
                     </button>
                   )}
                   
-                  {(project as any).apkLink && (
+                  {((project as any).apk_link || (project as any).apkLink) && (
                     <a 
-                      href={(project as any).apkLink} 
+                      href={(project as any).apk_link || (project as any).apkLink} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       onClick={(e) => {

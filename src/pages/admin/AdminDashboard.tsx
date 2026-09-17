@@ -5,6 +5,8 @@ import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Download, X, Mail, CheckCircle2, Archive, Trash2, Reply } from 'lucide-react';
 import AdminEvents from './AdminEvents';
+import AdminMissionGTA from './AdminMissionGTA';
+import AdminProjects from './AdminProjects';
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading } = useAuth();
@@ -347,13 +349,13 @@ export default function AdminDashboard() {
       </div>
       
       <div className="flex gap-4 mb-8 border-b border-white/10 pb-4 overflow-x-auto">
-        {['applications', 'members', 'users', 'messages', 'events'].map(tab => (
+        {['applications', 'members', 'users', 'messages', 'events', 'projects', 'mission_gta'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`relative px-4 py-2 rounded-full font-semibold capitalize whitespace-nowrap ${activeTab === tab ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:text-white'}`}
           >
-            {tab}
+            {tab.replace('_', ' ')}
             {tab === 'messages' && unreadMessageCount > 0 && (
               <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full border border-[#111]">
                 {unreadMessageCount}
@@ -408,6 +410,10 @@ export default function AdminDashboard() {
 
       {activeTab === 'events' ? (
         <AdminEvents />
+      ) : activeTab === 'projects' ? (
+        <AdminProjects />
+      ) : activeTab === 'mission_gta' ? (
+        <AdminMissionGTA />
       ) : (
         <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 overflow-x-auto">
           {loadingData ? (

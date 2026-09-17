@@ -85,3 +85,58 @@ export type CommunityApplication = {
   reviewed_at: string | null;
   reviewed_by: string | null;
 };
+
+export type ProjectGallery = {
+  id: string;
+  project_id: string;
+  image_url: string;
+  storage_path: string;
+  title: string | null;
+  created_at: string;
+};
+
+export type ProjectUpdate = {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  storage_path: string | null;
+  links: { label: string; url: string }[];
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProjectPerformance = {
+  id: string;
+  project_id: string;
+  fps: string;
+  gpu: string;
+  ram: string;
+  stability: string;
+  updated_at: string;
+};
+
+export type Project = {
+  id: string;
+  name: string;
+  short_description: string;
+  description: string | null;
+  category: string | null;
+  status: string | null;
+  logo: string | null;
+  cover_image: string | null;
+  link: string | null;
+  apk_link: string | null;
+  verified: boolean;
+  published: boolean;
+  visible_on_home: boolean;
+  display_order: number;
+  tags: string[];
+  links: { label: string; url: string }[];
+  created_at: string;
+  updated_at: string;
+};
+
+
