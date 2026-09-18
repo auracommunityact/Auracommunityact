@@ -1,7 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder.supabase.co') || supabaseKey === 'placeholder-key') {
+  throw new Error(
+    'Supabase environment variables are missing or invalid. ' +
+    'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in GitHub Secrets (for GitHub Pages deployment) or your .env file.'
+  );
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {

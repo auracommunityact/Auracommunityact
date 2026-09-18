@@ -35,10 +35,15 @@ export default function Signup() {
     setLoading(true);
     
     try {
+      const redirectUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}${import.meta.env.BASE_URL || '/'}`
+        : 'https://auracommunityact.github.io/Auracommunityact/';
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: formData.fullName,
             username: formData.username
