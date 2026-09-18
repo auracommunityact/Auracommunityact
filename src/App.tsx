@@ -22,7 +22,6 @@ import JoinCommunity from "./pages/JoinCommunity";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MembersDashboard from "./pages/members/MembersDashboard";
 import Guidelines from "./pages/Guidelines";
-import AuraAI from "./pages/AuraAI";
 import MissionGTAMobile from "./pages/MissionGTAMobile";
 
 export default function App() {
@@ -52,7 +51,6 @@ export default function App() {
             <Route path="join-community" element={<JoinCommunity />} />
             <Route path="admin/*" element={<AdminDashboard />} />
             <Route path="members" element={<MembersDashboard />} />
-            <Route path="aura-ai" element={<AuraAI />} />
           </Route>
         </Routes>
       </Router>
