@@ -5,6 +5,8 @@ export const siteConfig = {
   founderPhoto: "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/IMG_20260827_111033.jpg",
   address: "7gf.road 02, Hn.1, madarse wali gali, Alvi Nagar, Loni, Ghaziabad, Uttar Pradesh 201102, India",
   googleMapsQuery: "7gf.road 02, Hn.1, madarse wali gali, Alvi Nagar, Loni, Ghaziabad, Uttar Pradesh 201102, India",
+  email: "auracommunityact@googlegroups.com",
+  supportEmail: "auracommunityact@gmail.com",
   year: 2026,
   
   navLinks: [
