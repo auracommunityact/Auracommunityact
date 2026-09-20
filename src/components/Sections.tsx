@@ -440,7 +440,13 @@ export function FounderSection() {
   );
 }
 
-export function CommunitySection() {
+export function CommunitySection({
+  ctaLink = "/community",
+  ctaText = "Join Community",
+}: {
+  ctaLink?: string;
+  ctaText?: string;
+} = {}) {
   return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-purple-950/20 to-[#050505] border-y border-white/10"></div>
@@ -462,8 +468,8 @@ export function CommunitySection() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/community" className="w-full sm:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-600 text-black rounded-full font-bold shadow-lg shadow-amber-500/20 transition-all">
-              Join Community
+            <Link to={ctaLink} className="w-full sm:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-600 text-black rounded-full font-bold shadow-lg shadow-amber-500/20 transition-all">
+              {ctaText}
             </Link>
             <Link to="/contact" className="w-full sm:w-auto px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full font-bold hover:bg-white/10 transition-colors">
               Contact Us
