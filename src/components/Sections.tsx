@@ -481,6 +481,69 @@ export function CommunitySection({
   );
 }
 
+export function MusicStudioSection() {
+  return (
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full border-t border-white/10">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-amber-500/10 via-black/40 to-purple-900/10 border border-white/10 p-8 sm:p-12 lg:p-16 backdrop-blur-xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase mb-6">
+              Official Music Catalog
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+              Aura Music Studio
+            </h2>
+            
+            <p className="text-base sm:text-lg text-white/70 leading-relaxed mb-6">
+              Discover official songs, original soundtrack releases, and community music projects produced under Aura Community Act. Complete with audio previews, multi-platform streaming, and copyright metadata.
+            </p>
+
+            <div className="flex flex-wrap gap-4 text-xs text-white/50 mb-8">
+              <span className="font-medium text-white/70">℗ P Line: Aura Music Studio</span>
+              <span>•</span>
+              <span className="font-medium text-white/70">© C Line: Aura Music Studio</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <Link
+                to="/music"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-sm shadow-xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all"
+              >
+                Browse Music Catalog <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+              <span className="text-xs text-amber-400 font-bold uppercase tracking-wider block mb-2">Original Songs</span>
+              <p className="text-xs text-white/60">Official music tracks with master audio preview and high-res artwork.</p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+              <span className="text-xs text-amber-400 font-bold uppercase tracking-wider block mb-2">Distribution</span>
+              <p className="text-xs text-white/60">Official platform links for Spotify, Apple Music, YouTube & more.</p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+              <span className="text-xs text-amber-400 font-bold uppercase tracking-wider block mb-2">Multi-Format</span>
+              <p className="text-xs text-white/60">Singles, EPs, and Albums with verified ISRC and catalog codes.</p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+              <span className="text-xs text-amber-400 font-bold uppercase tracking-wider block mb-2">Audio Player</span>
+              <p className="text-xs text-white/60">Seamless continuous audio playback across mobile and desktop.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function LocationSection() {
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">

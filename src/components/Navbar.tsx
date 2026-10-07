@@ -21,6 +21,7 @@ export default function Navbar() {
   const getNavLinks = () => {
     const baseLinks = [
       { title: "Home", href: "/" },
+      { title: "Music", href: "/music" },
       { title: "Community", href: "/community" },
       { title: "About", href: "/about" },
       { title: "Contact", href: "/contact" },
@@ -29,6 +30,7 @@ export default function Navbar() {
     if (user) {
       const loggedInLinks = [
         { title: "Home", href: "/" },
+        { title: "Music", href: "/music" },
         { title: "Community", href: "/community" },
       ];
       

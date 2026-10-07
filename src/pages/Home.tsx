@@ -2,6 +2,7 @@ import {
   HeroSection, 
   AboutSection, 
   ProjectsSection, 
+  MusicStudioSection,
   ServicesSection, 
   CommunitySection 
 } from "../components/Sections";
@@ -14,6 +15,7 @@ export default function Home() {
       <MemberSpotlightSection />
       <AboutSection />
       <ProjectsSection />
+      <MusicStudioSection />
       <ServicesSection />
       <CommunitySection />
     </>

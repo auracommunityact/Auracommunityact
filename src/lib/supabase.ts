@@ -146,4 +146,6 @@ export type Project = {
   updated_at: string;
 };
 
+export type { MusicRelease, ReleaseStatus, ReleaseType, ReleaseFormData } from '../types/music';
+
 
