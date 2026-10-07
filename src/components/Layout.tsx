@@ -3,16 +3,18 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import StickyAudioPlayer from "./music/StickyAudioPlayer";
+import { useAudioPlayer } from "../contexts/AudioPlayerContext";
 
 export default function Layout() {
   const { pathname } = useLocation();
+  const { currentTrack } = useAudioPlayer();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050505] text-white">
+    <div className={`min-h-screen flex flex-col bg-[#050505] text-white ${currentTrack ? 'pb-20 sm:pb-24' : ''}`}>
       <Navbar />
       <main className="flex-1 pt-20 flex flex-col relative overflow-hidden">
         {/* Subtle background glow effects */}

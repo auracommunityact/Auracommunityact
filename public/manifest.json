@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Aura Community Act",
+  "short_name": "Aura Act",
+  "description": "Aura Community Act & Aura Music Studio — Learn, connect, listen to official music, and take action together.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "categories": ["music", "entertainment", "community"],
+  "icons": [
+    {
+      "src": "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/20260716_092212.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://qxoqflrqpwlythgqmjtq.supabase.co/storage/v1/object/public/app-icons/20260716_092212.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

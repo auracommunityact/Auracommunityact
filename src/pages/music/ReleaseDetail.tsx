@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Play, Pause, ArrowLeft, Disc, Volume2, VolumeX, Repeat, 
-  ExternalLink, Calendar, Music, Shield, Info, Share2, Check
+  ExternalLink, Calendar, Music, Shield, Info, Share2, Check,
+  ListPlus, SkipBack, SkipForward
 } from 'lucide-react';
 import { musicService } from '../../lib/musicService';
 import { MusicRelease } from '../../types/music';
@@ -30,6 +31,10 @@ export default function ReleaseDetail() {
     setVolume,
     toggleMute,
     toggleLoop,
+    addToQueue,
+    queue,
+    playNext,
+    playPrevious,
   } = useAudioPlayer();
 
   useEffect(() => {
@@ -229,6 +234,14 @@ export default function ReleaseDetail() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <button
+                    onClick={playPrevious}
+                    className="p-2 text-white/50 hover:text-white transition-colors"
+                    title="Previous track"
+                  >
+                    <SkipBack className="w-5 h-5" />
+                  </button>
+
+                  <button
                     onClick={handlePlayToggle}
                     className="w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center shadow-xl shadow-amber-500/20 active:scale-95 transition-all"
                     title={isThisPlaying ? 'Pause Track' : 'Play Track'}
@@ -240,7 +253,15 @@ export default function ReleaseDetail() {
                     )}
                   </button>
 
-                  <div>
+                  <button
+                    onClick={playNext}
+                    className="p-2 text-white/50 hover:text-white transition-colors"
+                    title="Next track"
+                  >
+                    <SkipForward className="w-5 h-5" />
+                  </button>
+
+                  <div className="ml-1">
                     <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider block">
                       {isThisPlaying ? 'Now Playing' : 'Official Audio Preview'}
                     </span>
@@ -251,6 +272,20 @@ export default function ReleaseDetail() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (release) {
+                        addToQueue(release);
+                        toast.success('Added to Queue');
+                      }
+                    }}
+                    className="p-2 rounded-lg text-xs text-white/60 hover:text-amber-400 hover:bg-white/5 transition-colors flex items-center gap-1.5"
+                    title="Add to play queue"
+                  >
+                    <ListPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Add to Queue</span>
+                  </button>
+
                   <button
                     onClick={toggleLoop}
                     className={`p-2 rounded-lg text-xs transition-colors ${

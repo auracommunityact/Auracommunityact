@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Disc, Search, Music, Shield, ExternalLink, Calendar, Radio } from 'lucide-react';
+import { Play, Pause, Disc, Search, Music, Shield, ExternalLink, Calendar, Radio, ListPlus } from 'lucide-react';
 import { musicService } from '../../lib/musicService';
 import { MusicRelease } from '../../types/music';
 import { useAudioPlayer } from '../../contexts/AudioPlayerContext';
+import { toast } from 'react-hot-toast';
 
 export default function MusicStudio() {
   const [releases, setReleases] = useState<MusicRelease[]>([]);
@@ -13,7 +14,7 @@ export default function MusicStudio() {
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay, addToQueue } = useAudioPlayer();
 
   useEffect(() => {
     fetchReleases();
@@ -71,7 +72,7 @@ export default function MusicStudio() {
     if (currentTrack?.id === release.id) {
       togglePlay();
     } else {
-      playTrack(release);
+      playTrack(release, filteredReleases);
     }
   };
 
@@ -306,12 +307,26 @@ export default function MusicStudio() {
                         })}
                       </span>
 
-                      <Link
-                        to={`/music/${release.id}`}
-                        className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-all text-xs"
-                      >
-                        Details <ExternalLink className="w-3 h-3" />
-                      </Link>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addToQueue(release);
+                            toast.success(`Added to Queue`);
+                          }}
+                          className="p-1.5 rounded-lg text-white/50 hover:text-amber-400 hover:bg-white/5 transition-colors"
+                          title="Add to Play Queue"
+                        >
+                          <ListPlus className="w-4 h-4" />
+                        </button>
+                        <Link
+                          to={`/music/${release.id}`}
+                          className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-all text-xs ml-1"
+                        >
+                          Details <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -379,10 +394,21 @@ export default function MusicStudio() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                       <span className="hidden md:inline text-xs text-white/40 font-mono">
                         {new Date(release.release_date).toLocaleDateString()}
                       </span>
+
+                      <button
+                        onClick={() => {
+                          addToQueue(release);
+                          toast.success(`Added to Queue`);
+                        }}
+                        className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-amber-400 transition-colors"
+                        title="Add to Play Queue"
+                      >
+                        <ListPlus className="w-4 h-4" />
+                      </button>
 
                       <Link
                         to={`/music/${release.id}`}
