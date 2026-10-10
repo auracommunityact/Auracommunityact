@@ -69,7 +69,8 @@ export default function MembersDashboard() {
       description: "Join our exclusive members-only channels to connect, collaborate, and chat.",
       icon: <MessageSquare className="w-6 h-6 text-amber-500" />,
       action: "Join Server",
-      link: "#"
+      link: "https://discord.gg/djMEkqa2m5",
+      external: true
     },
     {
       title: "ACT Design System",
@@ -112,7 +113,12 @@ export default function MembersDashboard() {
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">{resource.title}</h3>
                   <p className="text-white/60 text-sm mb-6 flex-1">{resource.description}</p>
-                  <a href={resource.link} className="inline-flex items-center gap-2 text-sm font-bold text-amber-500 hover:text-amber-400 mt-auto">
+                  <a 
+                    href={resource.link} 
+                    target={resource.external ? "_blank" : undefined}
+                    rel={resource.external ? "noopener noreferrer" : undefined}
+                    className="inline-flex items-center gap-2 text-sm font-bold text-amber-500 hover:text-amber-400 mt-auto"
+                  >
                     {resource.action} <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>

@@ -3,6 +3,17 @@ import { MusicRelease, ReleaseFormData, ReleaseStatus } from '../types/music';
 
 const API_BASE = '/api/music';
 
+export function notifyReleaseChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('aura:music-release-updated'));
+    try {
+      localStorage.setItem('aura_music_release_updated_at', Date.now().toString());
+    } catch (e) {
+      // ignore
+    }
+  }
+}
+
 export const musicService = {
   /**
    * Fetch all published releases for public visitors
@@ -121,6 +132,7 @@ export const musicService = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(inserted),
         }).catch(() => {});
+        notifyReleaseChanged();
         return inserted;
       }
     } catch (err) {
@@ -139,7 +151,9 @@ export const musicService = {
       throw new Error(errData.error || 'Failed to create release');
     }
 
-    return await res.json();
+    const created = await res.json();
+    notifyReleaseChanged();
+    return created;
   },
 
   /**
@@ -164,6 +178,7 @@ export const musicService = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updated),
         }).catch(() => {});
+        notifyReleaseChanged();
         return updated;
       }
     } catch (err) {
@@ -182,7 +197,9 @@ export const musicService = {
       throw new Error(errData.error || 'Failed to update release');
     }
 
-    return await res.json();
+    const updatedResult = await res.json();
+    notifyReleaseChanged();
+    return updatedResult;
   },
 
   /**
@@ -204,6 +221,7 @@ export const musicService = {
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.error || 'Failed to delete release');
     }
+    notifyReleaseChanged();
   },
 
   /**
