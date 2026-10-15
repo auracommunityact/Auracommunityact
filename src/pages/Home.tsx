@@ -1,5 +1,6 @@
 import Interactive3DHero from "../components/hero/Interactive3DHero";
 import ExploreAuraSection from "../components/home/ExploreAuraSection";
+import AuraPuzzleExperience from "../components/puzzles/AuraPuzzleExperience";
 import LatestReleasesSection from "../components/music/LatestReleasesSection";
 import { MemberSpotlightSection } from "../components/MemberSpotlightSection";
 import { 
@@ -13,31 +14,36 @@ import {
 export default function Home() {
   return (
     <>
-      {/* 1. Fullscreen Interactive 3D WebGL Hero */}
+      {/* 1. Fullscreen Real-Time 3D WebGL Hero with Character Host & Parallax */}
       <Interactive3DHero />
 
       {/* 2. Explore Aura Glassmorphism 3D Hub */}
       <ExploreAuraSection />
 
-      {/* 3. Database-driven Latest Music Releases (Audio Player integration) */}
+      {/* 3. Dedicated Interactive 3D Puzzle Experience (Harmonic Core Alignment) */}
+      <div id="puzzle" className="scroll-mt-24">
+        <AuraPuzzleExperience />
+      </div>
+
+      {/* 4. Database-driven Latest Music Releases (Audio Player integration) */}
       <LatestReleasesSection />
 
-      {/* 4. Active Member Spotlight */}
+      {/* 5. Active Member Spotlight */}
       <MemberSpotlightSection />
 
-      {/* 5. Projects & Tech Innovations (Live Supabase table integration) */}
+      {/* 6. Projects & Tech Innovations (Live Supabase table integration) */}
       <ProjectsSection />
 
-      {/* 6. Music Studio Feature Overview */}
+      {/* 7. Music Studio Feature Overview */}
       <MusicStudioSection />
 
-      {/* 7. About Aura Community Act */}
+      {/* 8. About Aura Community Act */}
       <AboutSection />
 
-      {/* 8. Digital Services & Initiatives */}
+      {/* 9. Digital Services & Initiatives */}
       <ServicesSection />
 
-      {/* 9. Futuristic Community Area */}
+      {/* 10. Futuristic Community Area */}
       <CommunitySection />
     </>
   );

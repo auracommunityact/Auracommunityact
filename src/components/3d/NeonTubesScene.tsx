@@ -11,15 +11,28 @@ export const COLOR_PALETTES = [
 ];
 
 interface NeonTubesSceneProps {
-  onPaletteChange?: (paletteIndex: number) => void;
+  paletteIndex?: number;
+  onCyclePalette?: () => void;
   className?: string;
 }
 
-export default function NeonTubesScene({ onPaletteChange, className = '' }: NeonTubesSceneProps) {
+export default function NeonTubesScene({
+  paletteIndex: controlledPaletteIndex,
+  onCyclePalette,
+  className = '',
+}: NeonTubesSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [paletteIndex, setPaletteIndex] = useState(0);
+  const [localPaletteIndex, setLocalPaletteIndex] = useState(0);
   const [hasWebGL, setHasWebGL] = useState(true);
-  const [isInteracting, setIsInteracting] = useState(false);
+
+  // Active palette index (controlled or internal)
+  const activePaletteIndex = controlledPaletteIndex !== undefined ? controlledPaletteIndex : localPaletteIndex;
+
+  // Stable ref for parent cycle callback so event listeners never need rebinding
+  const onCyclePaletteRef = useRef(onCyclePalette);
+  useEffect(() => {
+    onCyclePaletteRef.current = onCyclePalette;
+  });
 
   // References for Three.js cleanup and animation loop
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -31,19 +44,24 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const clockRef = useRef(new THREE.Clock());
 
-  // Function to cycle palettes
-  const cyclePalette = useCallback(() => {
-    setPaletteIndex((prev) => {
-      const next = (prev + 1) % COLOR_PALETTES.length;
-      if (onPaletteChange) onPaletteChange(next);
-      return next;
-    });
-  }, [onPaletteChange]);
+  // Trigger palette cycle directly without side-effects during render
+  const triggerCyclePalette = useCallback(() => {
+    if (onCyclePaletteRef.current) {
+      onCyclePaletteRef.current();
+    } else {
+      setLocalPaletteIndex((prev) => (prev + 1) % COLOR_PALETTES.length);
+    }
+  }, []);
 
-  // Update tube material colors when palette changes
+  const triggerCyclePaletteRef = useRef(triggerCyclePalette);
+  useEffect(() => {
+    triggerCyclePaletteRef.current = triggerCyclePalette;
+  }, [triggerCyclePalette]);
+
+  // Update tube material colors smoothly when palette changes without rebuilding the scene
   useEffect(() => {
     if (!tubesGroupRef.current) return;
-    const current = COLOR_PALETTES[paletteIndex];
+    const current = COLOR_PALETTES[activePaletteIndex] || COLOR_PALETTES[0];
     const colors = [current.primary, current.secondary, current.accent];
 
     tubesGroupRef.current.children.forEach((child, i) => {
@@ -53,8 +71,9 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
         child.material.emissive.setHex(col);
       }
     });
-  }, [paletteIndex]);
+  }, [activePaletteIndex]);
 
+  // Primary Three.js setup effect - mounts once
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -88,13 +107,12 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
         powerPreference: 'high-performance',
       });
       renderer.setSize(width, height);
-      // Adaptively limit DPR to 2 for sharp retina but smooth 60fps performance
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.2;
       container.appendChild(renderer.domElement);
       rendererRef.current = renderer;
-    } catch (e) {
+    } catch {
       setHasWebGL(false);
       return;
     }
@@ -120,8 +138,8 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
     tubesGroupRef.current = tubesGroup;
     scene.add(tubesGroup);
 
-    const currentPalette = COLOR_PALETTES[paletteIndex];
-    const paletteHexes = [currentPalette.primary, currentPalette.secondary, currentPalette.accent];
+    const initialPalette = COLOR_PALETTES[0];
+    const paletteHexes = [initialPalette.primary, initialPalette.secondary, initialPalette.accent];
 
     // Create 9 fluid, intertwining 3D parametric curves
     const tubeCount = 9;
@@ -236,7 +254,7 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
         const dy = Math.abs(e.changedTouches[0].clientY - touchStartRef.current.y);
         // If it was a clean tap without large scroll drag, cycle palette
         if (dx < 10 && dy < 10) {
-          cyclePalette();
+          triggerCyclePaletteRef.current();
         }
       }
       touchStartRef.current = null;
@@ -246,7 +264,7 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
       // Don't cycle if the user clicked an interactive link or button
       const target = e.target as HTMLElement;
       if (target.closest('a, button, input, [role="button"]')) return;
-      cyclePalette();
+      triggerCyclePaletteRef.current();
     };
 
     const handleResize = () => {
@@ -344,7 +362,7 @@ export default function NeonTubesScene({ onPaletteChange, className = '' }: Neon
         }
       }
     };
-  }, [cyclePalette]);
+  }, []); // Run once on mount
 
   if (!hasWebGL) {
     // Beautiful CSS fallback if WebGL is unavailable

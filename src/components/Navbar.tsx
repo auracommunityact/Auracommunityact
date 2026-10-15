@@ -6,7 +6,11 @@ import { cn } from "../lib/utils";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 
-export default function Navbar() {
+interface NavbarProps {
+  onOpenIntro?: () => void;
+}
+
+export default function Navbar({ onOpenIntro }: NavbarProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -127,7 +131,18 @@ export default function Navbar() {
           </nav>
 
           {/* Desktop CTAs and User Area */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
+            {onOpenIntro && (
+              <button
+                onClick={onOpenIntro}
+                className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-white/90 hover:text-white transition flex items-center gap-1.5 text-xs font-mono cursor-pointer"
+                title="Launch 3D Cinematic Intro"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#00F3FF]" />
+                <span>3D Intro</span>
+              </button>
+            )}
+
             {!user ? (
               <>
                 <Link 
@@ -221,6 +236,19 @@ export default function Navbar() {
             })}
 
             <div className="pt-6 border-t border-white/10 flex flex-col gap-3">
+              {onOpenIntro && (
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    onOpenIntro();
+                  }}
+                  className="w-full py-3 rounded-xl bg-white/5 border border-white/15 text-white font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-white/10 transition"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#00F3FF]" />
+                  <span>Launch 3D Cinematic Intro</span>
+                </button>
+              )}
+
               {!user ? (
                 <>
                   <Link
