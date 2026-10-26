@@ -1,5 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
-  <rect width="256" height="256" rx="48" fill="#1E1E1E"/>
-  <path d="M72 104 L112 144 L72 184" fill="none" stroke="#4DAAF2" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="136" y1="184" x2="184" y2="184" fill="none" stroke="#4DAAF2" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline App Icon</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .app-icon {
+      width: 320px;
+      height: 320px;
+      background-color: #000000;
+      border-radius: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-icon">
+    <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Main Upper 'A' Gradient -->
+        <linearGradient id="upperGrad" x1="25%" y1="15%" x2="80%" y2="85%">
+          <stop offset="0%" stop-color="#4e18f7" />
+          <stop offset="45%" stop-color="#8b1df2" />
+          <stop offset="80%" stop-color="#ef1788" />
+          <stop offset="100%" stop-color="#ff3847" />
+        </linearGradient>
+
+        <!-- Left Facet Overlay Gradient -->
+        <linearGradient id="facetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3c10d4" stop-opacity="0.55" />
+          <stop offset="100%" stop-color="#7c16e8" stop-opacity="0.0" />
+        </linearGradient>
+
+        <!-- Swoosh Ribbon Gradient -->
+        <linearGradient id="swooshGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#4e12d6" />
+          <stop offset="28%" stop-color="#a511c2" />
+          <stop offset="55%" stop-color="#f9196a" />
+          <stop offset="80%" stop-color="#ff7417" />
+          <stop offset="100%" stop-color="#ffb800" />
+        </linearGradient>
+
+        <!-- Bottom-Right Leg Gradient -->
+        <linearGradient id="rightLegGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+          <stop offset="0%" stop-color="#fa3c25" />
+          <stop offset="50%" stop-color="#ff8800" />
+          <stop offset="100%" stop-color="#ffd000" />
+        </linearGradient>
+      </defs>
+
+      <!-- Background -->
+      <rect width="1000" height="1000" fill="#000000" />
+
+      <!-- 1. Upper Body of 'A' (with inner triangle cutout) -->
+      <path fill="url(#upperGrad)" fill-rule="evenodd" d="
+        M 465 318
+        C 478 290, 512 290, 525 318
+        L 615 496
+        C 535 545, 430 595, 318 642
+        Z
+        M 488 442
+        C 491 436, 496 436, 499 442
+        L 526 525
+        C 500 537, 472 548, 445 556
+        Z
+      " />
+
+      <!-- Subtle Facet Shading on Left Side of 'A' -->
+      <path fill="url(#facetGrad)" d="
+        M 465 318
+        C 472 303, 485 296, 498 298
+        L 488 442
+        L 445 556
+        L 375 617
+        L 318 642
+        Z
+      " />
+
+      <!-- 2. Swoosh Ribbon -->
+      <path fill="url(#swooshGrad)" d="
+        M 312 668
+        C 455 604, 575 545, 636 490
+        C 652 475, 642 462, 616 456
+        C 652 454, 676 466, 673 488
+        C 668 525, 585 588, 382 688
+        C 340 706, 308 688, 312 668
+        Z
+      " />
+
+      <!-- 3. Bottom-Right Leg -->
+      <path fill="url(#rightLegGrad)" d="
+        M 643 546
+        L 693 644
+        C 702 662, 686 676, 666 668
+        L 540 609
+        C 578 590, 614 569, 643 546
+        Z
+      " />
+    </svg>
